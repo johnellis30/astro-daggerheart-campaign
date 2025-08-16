@@ -190,11 +190,34 @@ const environmentPosts = (await getCollection('environments'))
 				});
 			}
 
+			function updateContentLinks() {
+				const currentView = getCurrentView();
+				const isGMView = currentView === VIEW_TYPES.GM;
+				
+				// Update content list links
+				const contentLinks = document.querySelectorAll('.post-item a[href]');
+				contentLinks.forEach(link => {
+					const url = new URL(link.href);
+					if (isGMView) {
+						url.searchParams.set('view', 'gm');
+					} else {
+						url.searchParams.delete('view');
+					}
+					link.href = url.toString();
+				});
+			}
+
 			// Filter content on page load
-			document.addEventListener('DOMContentLoaded', filterContent);
+			document.addEventListener('DOMContentLoaded', () => {
+				filterContent();
+				updateContentLinks();
+			});
 			
 			// Re-filter when URL changes (for back/forward navigation)
-			window.addEventListener('popstate', filterContent);
+			window.addEventListener('popstate', () => {
+				filterContent();
+				updateContentLinks();
+			});
 		</script>
 	</body>
 </html>

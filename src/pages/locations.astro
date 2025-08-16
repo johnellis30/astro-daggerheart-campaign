@@ -2,6 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import ViewToggle from '../components/ViewToggle.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { getCollection } from 'astro:content';
 import FormattedDate from '../components/FormattedDate.astro';
@@ -67,6 +68,36 @@ const locationPosts = (await getCollection('locations'))
 			ul a:hover img {
 				box-shadow: var(--box-shadow);
 			}
+			.post-item {
+				transition: opacity 0.2s ease;
+			}
+			.post-item.hidden {
+				display: none;
+			}
+			.gm-only-indicator {
+				position: absolute;
+				top: 8px;
+				left: 8px;
+				background: #ff6b35;
+				color: white;
+				padding: 0.25rem 0.5rem;
+				border-radius: 4px;
+				font-size: 0.75rem;
+				font-weight: 600;
+				z-index: 10;
+			}
+			.player-safe-indicator {
+				position: absolute;
+				top: 8px;
+				left: 8px;
+				background: #28a745;
+				color: white;
+				padding: 0.25rem 0.5rem;
+				border-radius: 4px;
+				font-size: 0.75rem;
+				font-weight: 600;
+				z-index: 10;
+			}
 			@media (max-width: 720px) {
 				ul {
 					gap: 0.5em;
@@ -93,17 +124,23 @@ const locationPosts = (await getCollection('locations'))
 	</head>
 	<body>
 		<Header />
+		<ViewToggle />
 		<main>
 			<div class="page-header">
 				<h1>Locations</h1>
 				<p>Places and environments in the campaign world</p>
 			</div>
 			<section>
-				<ul>
+				<ul id="location-list">
 					{
 						locationPosts.map((post) => (
-							<li>
+							<li class="post-item" 
+								data-gm-only={post.data.gmOnly || false} 
+								data-player-visible={post.data.playerVisible !== false}
+								data-has-spoilers={post.data.tags?.includes('spoiler') || false}>
 								<a href={`/locations/${post.slug}/`}>
+									{post.data.gmOnly && <div class="gm-only-indicator">GM Only</div>}
+									{post.data.playerVisible === true && <div class="player-safe-indicator">Player Safe</div>}
 									<img width={320} height={200} src={post.data.heroImage} alt="" />
 									<h4 class="title">{post.data.title}</h4>
 									<p class="date">
@@ -118,5 +155,74 @@ const locationPosts = (await getCollection('locations'))
 			</section>
 		</main>
 		<Footer />
+		
+		<script>
+			const VIEW_TYPES = {
+				PLAYER: 'player',
+				GM: 'gm'
+			};
+
+			function getCurrentView() {
+				const params = new URLSearchParams(window.location.search);
+				const view = params.get('view');
+				return view === VIEW_TYPES.GM ? VIEW_TYPES.GM : VIEW_TYPES.PLAYER;
+			}
+
+			function filterContent() {
+				const currentView = getCurrentView();
+				const posts = document.querySelectorAll('.post-item');
+				
+				posts.forEach(post => {
+					const gmOnly = post.dataset.gmOnly === 'true';
+					const playerVisible = post.dataset.playerVisible === 'true';
+					const hasSpoilers = post.dataset.hasSpoilers === 'true';
+					
+					let shouldShow = true;
+					
+					if (currentView === VIEW_TYPES.PLAYER) {
+						// Player view: hide GM-only content and spoilers
+						if (gmOnly || hasSpoilers || playerVisible === false) {
+							shouldShow = false;
+						}
+					}
+					// GM view: show everything (shouldShow remains true)
+					
+					if (shouldShow) {
+						post.classList.remove('hidden');
+					} else {
+						post.classList.add('hidden');
+					}
+				});
+			}
+
+			function updateContentLinks() {
+				const currentView = getCurrentView();
+				const isGMView = currentView === VIEW_TYPES.GM;
+				
+				// Update content list links
+				const contentLinks = document.querySelectorAll('.post-item a[href]');
+				contentLinks.forEach(link => {
+					const url = new URL(link.href);
+					if (isGMView) {
+						url.searchParams.set('view', 'gm');
+					} else {
+						url.searchParams.delete('view');
+					}
+					link.href = url.toString();
+				});
+			}
+
+			// Filter content on page load
+			document.addEventListener('DOMContentLoaded', () => {
+				filterContent();
+				updateContentLinks();
+			});
+			
+			// Re-filter when URL changes (for back/forward navigation)
+			window.addEventListener('popstate', () => {
+				filterContent();
+				updateContentLinks();
+			});
+		</script>
 	</body>
 </html>

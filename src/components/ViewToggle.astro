@@ -124,6 +124,9 @@
         warning.textContent = '⚠️ GM Mode: Showing all content including spoilers';
         document.body.appendChild(warning);
       }
+      
+      // Update all navigation links to include view=gm
+      updateNavigationLinks(true);
     } else {
       label.textContent = 'Player View';
       label.classList.remove('gm');
@@ -132,7 +135,36 @@
       // Remove GM warning
       const warning = document.querySelector('.gm-warning');
       if (warning) warning.remove();
+      
+      // Remove view=gm from navigation links
+      updateNavigationLinks(false);
     }
+  }
+
+  function updateNavigationLinks(isGMView) {
+    // Update header navigation links
+    const headerLinks = document.querySelectorAll('header a[href]');
+    headerLinks.forEach(link => {
+      const url = new URL(link.href);
+      if (isGMView) {
+        url.searchParams.set('view', 'gm');
+      } else {
+        url.searchParams.delete('view');
+      }
+      link.href = url.toString();
+    });
+    
+    // Update content list links
+    const contentLinks = document.querySelectorAll('.post-item a[href]');
+    contentLinks.forEach(link => {
+      const url = new URL(link.href);
+      if (isGMView) {
+        url.searchParams.set('view', 'gm');
+      } else {
+        url.searchParams.delete('view');
+      }
+      link.href = url.toString();
+    });
   }
 
   // Initialize on page load
