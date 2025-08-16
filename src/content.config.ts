@@ -1,6 +1,8 @@
 import { defineCollection, z } from "astro:content";
 
 // Common schema for all campaign content
+// Default behavior: gmOnly=true, playerVisible=false (GM-only content)
+// For player-visible content: set playerVisible=true explicitly
 const campaignContentSchema = z.object({
   title: z.string(),
   description: z.string(),
@@ -8,8 +10,8 @@ const campaignContentSchema = z.object({
   updatedDate: z.coerce.date().optional(),
   heroImage: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  playerVisible: z.boolean().optional(),
-  gmOnly: z.boolean().optional(),
+  playerVisible: z.boolean().optional(), // Set to true for player-visible content
+  gmOnly: z.boolean().optional(), // Set to true for GM-only content (recommended default)
 });
 
 // Blog collection (for regular blog posts)

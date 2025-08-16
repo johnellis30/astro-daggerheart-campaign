@@ -89,6 +89,27 @@ const monsterPosts = (await getCollection('monsters'))
 				color: rgb(var(--gray));
 				font-size: 1.1rem;
 			}
+			.post-item.hidden {
+				display: none;
+			}
+			.gm-only-indicator, .player-safe-indicator {
+				position: absolute;
+				top: 8px;
+				left: 8px;
+				padding: 2px 6px;
+				border-radius: 4px;
+				font-size: 0.75rem;
+				font-weight: 600;
+				z-index: 10;
+			}
+			.gm-only-indicator {
+				background: #ff6b35;
+				color: white;
+			}
+			.player-safe-indicator {
+				background: #2ecc71;
+				color: white;
+			}
 		</style>
 	</head>
 	<body>
@@ -99,11 +120,16 @@ const monsterPosts = (await getCollection('monsters'))
 				<p>Adversaries and creatures in the campaign</p>
 			</div>
 			<section>
-				<ul>
+				<ul id="monster-list">
 					{
 						monsterPosts.map((post) => (
-							<li>
+							<li class="post-item" 
+								data-gm-only={post.data.gmOnly || false} 
+								data-player-visible={post.data.playerVisible !== false}
+								data-has-spoilers={post.data.tags?.includes('spoiler') || false}>
 								<a href={`/monsters/${post.slug}/`}>
+									{post.data.gmOnly && <div class="gm-only-indicator">GM Only</div>}
+									{post.data.playerVisible === true && <div class="player-safe-indicator">Player Safe</div>}
 									<img width={320} height={200} src={post.data.heroImage} alt="" />
 									<h4 class="title">{post.data.title}</h4>
 									<p class="date">
@@ -118,5 +144,51 @@ const monsterPosts = (await getCollection('monsters'))
 			</section>
 		</main>
 		<Footer />
+		
+		<script>
+			const VIEW_TYPES = {
+				PLAYER: 'player',
+				GM: 'gm'
+			};
+
+			function getCurrentView() {
+				const params = new URLSearchParams(window.location.search);
+				const view = params.get('view');
+				return view === VIEW_TYPES.GM ? VIEW_TYPES.GM : VIEW_TYPES.PLAYER;
+			}
+
+			function filterContent() {
+				const currentView = getCurrentView();
+				const posts = document.querySelectorAll('.post-item');
+				
+				posts.forEach(post => {
+					const gmOnly = post.dataset.gmOnly === 'true';
+					const playerVisible = post.dataset.playerVisible === 'true';
+					const hasSpoilers = post.dataset.hasSpoilers === 'true';
+					
+					let shouldShow = true;
+					
+					if (currentView === VIEW_TYPES.PLAYER) {
+						// Player view: hide GM-only content and spoilers
+						if (gmOnly || hasSpoilers || playerVisible === false) {
+							shouldShow = false;
+						}
+					}
+					// GM view: show everything (shouldShow remains true)
+					
+					if (shouldShow) {
+						post.classList.remove('hidden');
+					} else {
+						post.classList.add('hidden');
+					}
+				});
+			}
+
+			// Filter content on page load
+			document.addEventListener('DOMContentLoaded', filterContent);
+			
+			// Re-filter when URL changes (for back/forward navigation)
+			window.addEventListener('popstate', filterContent);
+		</script>
 	</body>
 </html>
