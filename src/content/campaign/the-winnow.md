@@ -4,6 +4,8 @@ description: "Campaign content"
 pubDate: "2025-08-16"
 tags: ["dnd","campaign"]
 heroImage: "/blog-placeholder-2.jpg"
+gmOnly: true
+playerVisible: false
 ---
 
 

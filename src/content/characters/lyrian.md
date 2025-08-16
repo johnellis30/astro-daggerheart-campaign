@@ -4,7 +4,8 @@ description: "Dying Sylvani Ranger found in the Atherian Steppes."
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","npc","character"]
 heroImage: "/blog-placeholder-about.jpg"
-playerVisible: true
+gmOnly: true
+playerVisible: false
 ---
 
 

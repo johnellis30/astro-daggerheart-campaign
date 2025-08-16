@@ -4,6 +4,8 @@ description: "A vast expanse of open plains, characterized by tall grasses, roll
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","environment"]
 heroImage: "/blog-placeholder-3.jpg"
+gmOnly: true
+playerVisible: false
 ---
 
 

@@ -4,7 +4,8 @@ description: "Elara Meadowlight is the respected Village Elder of Riverbend and 
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","npc","character"]
 heroImage: "/blog-placeholder-2.jpg"
-playerVisible: true
+gmOnly: true
+playerVisible: false
 ---
 
 

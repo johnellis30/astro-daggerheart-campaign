@@ -4,6 +4,8 @@ description: "A hardened steppes survivor, skilled in melee combat and intimidat
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","monster","adversary"]
 heroImage: "/blog-placeholder-2.jpg"
+gmOnly: true
+playerVisible: false
 ---
 
 

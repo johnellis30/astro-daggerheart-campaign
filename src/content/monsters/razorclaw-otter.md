@@ -4,6 +4,8 @@ description: "Ferocious river otters with unusually sharp claws, agitated by mag
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","monster","adversary"]
 heroImage: "/blog-placeholder-5.jpg"
+gmOnly: true
+playerVisible: false
 ---
 
 

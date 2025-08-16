@@ -4,7 +4,8 @@ description: "A brutal Atherian commander known for efficiency and unwavering lo
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","npc","character"]
 heroImage: "/blog-placeholder-2.jpg"
-playerVisible: true
+gmOnly: true
+playerVisible: false
 ---
 
 

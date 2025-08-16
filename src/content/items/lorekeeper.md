@@ -4,7 +4,8 @@ description: "A worn leather-bound book, its pages filled with handwritten notes
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","item","loot"]
 heroImage: "/blog-placeholder-3.jpg"
-playerVisible: true
+gmOnly: true
+playerVisible: false
 ---
 
 

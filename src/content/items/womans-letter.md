@@ -4,6 +4,8 @@ description: "A draft of a letter, seemingly never sent."
 pubDate: "2025-08-16"
 tags: ["dnd","campaign"]
 heroImage: "/blog-placeholder-1.jpg"
+gmOnly: true
+playerVisible: false
 ---
 
 

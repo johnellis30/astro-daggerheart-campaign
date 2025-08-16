@@ -4,7 +4,8 @@ description: "Rumored to be a powerful mage operating deep within the Sylvani Wo
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","npc","character"]
 heroImage: "/blog-placeholder-5.jpg"
-playerVisible: true
+gmOnly: true
+playerVisible: false
 ---
 
 

@@ -4,7 +4,8 @@ description: "Human Blacksmith in Riverbend."
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","npc","character"]
 heroImage: "/blog-placeholder-5.jpg"
-playerVisible: true
+gmOnly: true
+playerVisible: false
 ---
 
 ---

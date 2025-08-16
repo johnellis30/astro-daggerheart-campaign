@@ -4,6 +4,8 @@ description: "The Atherian Empire is a powerful, human-led empire that dominates
 pubDate: "2025-08-16"
 tags: ["dnd","campaign"]
 heroImage: "/blog-placeholder-about.jpg"
+gmOnly: true
+playerVisible: false
 ---
 
 

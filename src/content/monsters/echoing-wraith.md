@@ -4,6 +4,8 @@ description: "A haunting, spectral entity feeding on the party's fears and stres
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","monster","adversary"]
 heroImage: "/images/monsters/echoing-wraith.jpg"
+gmOnly: true
+playerVisible: false
 ---
 
 

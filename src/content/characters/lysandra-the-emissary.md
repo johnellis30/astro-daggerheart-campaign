@@ -4,7 +4,8 @@ description: "A cunning figure within The Winnow, acting as a liaison between th
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","npc","character"]
 heroImage: "/blog-placeholder-3.jpg"
-playerVisible: true
+gmOnly: true
+playerVisible: false
 ---
 
 

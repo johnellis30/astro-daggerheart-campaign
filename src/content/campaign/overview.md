@@ -4,6 +4,8 @@ description: "Give me this ending, but this is now going to redefine the next 3 
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","lore","campaign"]
 heroImage: "/blog-placeholder-about.jpg"
+gmOnly: true
+playerVisible: false
 ---
 
 

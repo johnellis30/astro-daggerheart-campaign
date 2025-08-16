@@ -4,6 +4,8 @@ description: "You are on Yolen, a planet simmering with tension."
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","lore","campaign"]
 heroImage: "/blog-placeholder-4.jpg"
+gmOnly: true
+playerVisible: false
 ---
 
 

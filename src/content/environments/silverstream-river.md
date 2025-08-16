@@ -4,6 +4,8 @@ description: "A swift-moving river, now surging with raw, unpredictable magical 
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","environment"]
 heroImage: "/blog-placeholder-5.jpg"
+gmOnly: true
+playerVisible: false
 ---
 
 
