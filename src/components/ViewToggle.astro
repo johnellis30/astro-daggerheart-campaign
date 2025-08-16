@@ -1,0 +1,147 @@
+---
+---
+
+<div id="view-toggle" class="view-toggle">
+  <div class="view-indicator">
+    <span class="view-label" id="current-view-label">Player View</span>
+    <button id="toggle-view-btn" class="toggle-btn">Switch to GM View</button>
+  </div>
+</div>
+
+<style>
+  .view-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgb(var(--gray-light));
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 4px 12px rgba(var(--black), 10%);
+    z-index: 1000;
+    font-size: 0.875rem;
+  }
+
+  .view-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .view-label {
+    font-weight: 600;
+    color: rgb(var(--black));
+  }
+
+  .view-label.gm {
+    color: rgb(var(--accent));
+  }
+
+  .toggle-btn {
+    background: rgb(var(--accent));
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .toggle-btn:hover {
+    background: rgb(var(--accent-dark));
+    transform: translateY(-1px);
+  }
+
+  .gm-warning {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: #ff6b35;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    z-index: 999;
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    .view-toggle {
+      position: relative;
+      top: 0;
+      right: 0;
+      margin: 1rem;
+      text-align: center;
+    }
+  }
+</style>
+
+<script>
+  // Import view management functions
+  const VIEW_TYPES = {
+    PLAYER: 'player',
+    GM: 'gm'
+  };
+
+  function getCurrentView() {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    return view === VIEW_TYPES.GM ? VIEW_TYPES.GM : VIEW_TYPES.PLAYER;
+  }
+
+  function toggleView() {
+    const currentView = getCurrentView();
+    const targetView = currentView === VIEW_TYPES.GM ? VIEW_TYPES.PLAYER : VIEW_TYPES.GM;
+    
+    const url = new URL(window.location);
+    if (targetView === VIEW_TYPES.PLAYER) {
+      url.searchParams.delete('view');
+    } else {
+      url.searchParams.set('view', targetView);
+    }
+    
+    window.location.href = url.toString();
+  }
+
+  function updateViewIndicator() {
+    const currentView = getCurrentView();
+    const label = document.getElementById('current-view-label');
+    const button = document.getElementById('toggle-view-btn');
+    
+    if (currentView === VIEW_TYPES.GM) {
+      label.textContent = 'GM View';
+      label.classList.add('gm');
+      button.textContent = 'Switch to Player View';
+      
+      // Add GM warning
+      if (!document.querySelector('.gm-warning')) {
+        const warning = document.createElement('div');
+        warning.className = 'gm-warning';
+        warning.textContent = '⚠️ GM Mode: Showing all content including spoilers';
+        document.body.appendChild(warning);
+      }
+    } else {
+      label.textContent = 'Player View';
+      label.classList.remove('gm');
+      button.textContent = 'Switch to GM View';
+      
+      // Remove GM warning
+      const warning = document.querySelector('.gm-warning');
+      if (warning) warning.remove();
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    updateViewIndicator();
+    
+    const toggleButton = document.getElementById('toggle-view-btn');
+    if (toggleButton) {
+      toggleButton.addEventListener('click', toggleView);
+    }
+  });
+</script>
