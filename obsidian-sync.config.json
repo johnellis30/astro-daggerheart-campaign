@@ -1,0 +1,43 @@
+{
+  "obsidianVaultPath": "C:/Users/johnd/OneDrive/Documents/Obsidian Vault",
+  "blogContentDir": "./src/content/blog/obsidian",
+  "syncSettings": {
+    "includeFiles": [
+      "Campaign Primer.md",
+      "CAMPAIGN_OVERVIEW.md",
+      "The Atherian Empire.md",
+      "LOCATION_RIVERBEND.md",
+      "LOCATION_ELDORIA.md",
+      "NPC_ELARA_MEADOWLIGHT.md",
+      "NPC_BARUK_GRIMSTONE.md"
+    ],
+    "includePatterns": [
+      "ACT1_*.md",
+      "LOCATION_*.md"
+    ],
+    "excludeFiles": [
+      "private-notes.md",
+      "session-prep.md"
+    ],
+    "excludePatterns": [
+      "*_PRIVATE.md",
+      "TEMP_*.md"
+    ],
+    "includeTags": [
+      "published",
+      "campaign",
+      "public"
+    ],
+    "excludeTags": [
+      "private",
+      "draft",
+      "personal"
+    ]
+  },
+  "frontmatterDefaults": {
+    "defaultDescription": "Campaign content from Obsidian vault",
+    "defaultTags": ["dnd", "campaign"],
+    "addCreatedDate": true,
+    "addUpdatedDate": true
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "aiAgent": {
+    "model": "gpt-4-turbo-preview",
+    "temperature": 0.7,
+    "maxTokens": 2000,
+    "maxContextFiles": 5,
+    "systemPrompts": {
+      "default": "You are an expert D&D campaign creator and worldbuilder specialized in creating consistent, immersive content that fits established campaign worlds.",
+      "npc": "You are an expert at creating memorable D&D NPCs with detailed personalities, motivations, and backstories that fit seamlessly into existing campaigns.",
+      "location": "You are a master worldbuilder who creates vivid, detailed locations with rich history, interesting features, and adventure hooks.",
+      "adventure": "You are an experienced D&D DM who creates engaging adventures with compelling plots, interesting encounters, and meaningful choices.",
+      "monster": "You are skilled at creating balanced and interesting D&D monsters with unique abilities and compelling lore."
+    },
+    "contentCategories": {
+      "character": ["NPC_", "CHARACTER_"],
+      "location": ["LOCATION_", "PLACE_"],
+      "adventure": ["ACT", "SUB", "QUEST_", "ADVENTURE_"],
+      "monster": ["ADVERSARY_", "MONSTER_", "CREATURE_"],
+      "item": ["LOOT_", "ITEM_", "ARTIFACT_"],
+      "environment": ["ENVIRONMENT_", "TERRAIN_"],
+      "campaign": ["CAMPAIGN_", "OVERVIEW", "PRIMER"]
+    },
+    "templates": {
+      "npc": {
+        "sections": ["Description", "Personality", "Background", "Goals & Motivations", "Stats & Abilities", "Relationships", "Adventure Hooks"],
+        "tags": ["npc", "character"]
+      },
+      "location": {
+        "sections": ["Overview", "History", "Notable Features", "Important NPCs", "Adventure Hooks", "Random Encounters"],
+        "tags": ["location", "worldbuilding"]
+      },
+      "adventure": {
+        "sections": ["Overview", "Background", "Adventure Hooks", "Key Locations", "Important NPCs", "Encounters", "Rewards"],
+        "tags": ["adventure", "quest"]
+      },
+      "monster": {
+        "sections": ["Description", "Behavior", "Habitat", "Combat Tactics", "Lore", "Stat Block"],
+        "tags": ["monster", "combat"]
+      }
+    }
+  }
+}
