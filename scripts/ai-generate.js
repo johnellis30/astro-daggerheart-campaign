@@ -43,17 +43,13 @@ try {
   console.log(`\n📊 Tokens used: ${result.tokensUsed}`);
   
   if (outputFile) {
-    let filename = outputFile;
-    if (!filename.endsWith('.md')) {
-      filename += '.md';
-    }
-    
-    const vaultPath = 'C:/Users/johnd/OneDrive/Documents/Obsidian Vault';
-    const filePath = path.join(vaultPath, filename);
-    
-    fs.writeFileSync(filePath, result.content);
-    console.log(`✅ Content saved to: ${filename}`);
-    console.log('💡 Run "npm run sync-obsidian" to sync it to your blog');
+    // Use the agent's saveContent method which saves to ai-generated folder
+    const contentType = agent.detectContentType(prompt);
+    const saveResult = agent.saveContent(result.content, outputFile, contentType, prompt);
+    console.log(`✅ Content saved to: ${saveResult.saveLocation}`);
+    console.log(`📁 Content type: ${saveResult.contentType}`);
+    console.log(`💡 Suggested destination: ${saveResult.suggestedFolder}`);
+    console.log(`� To move: mv "${saveResult.saveLocation}" "${saveResult.suggestedFolder}"`);
   }
   
 } catch (error) {

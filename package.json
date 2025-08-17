@@ -21,6 +21,7 @@
     "astro": "5.10.1",
     "dotenv": "^17.2.1",
     "openai": "^5.12.2",
+    "pdf-parse": "^1.1.1",
     "typescript": "5.8.3"
   },
   "devDependencies": {
@@ -39,6 +40,7 @@
     "dev-with-sync": "npm run sync-obsidian && npm run dev",
     "ai-cli": "node scripts/ai-cli.js",
     "ai-generate": "node scripts/ai-generate.js",
+    "organize-ai": "node scripts/organize-ai-content.js",
     "web-ai": "node scripts/web-ai-cli.js",
     "optimize-content": "node scripts/optimize-content.js",
     "simple-optimize": "node scripts/simple-optimize.js",

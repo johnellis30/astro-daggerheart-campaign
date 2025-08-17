@@ -25,6 +25,8 @@ const CONTENT_DIRS = [
   path.join(__dirname, '../src/content/campaign'),
   path.join(__dirname, '../src/content/environments')
 ];
+const REFERENCE_DOCS_DIR = path.join(__dirname, '../reference-docs');
+const AI_GENERATED_DIR = path.join(__dirname, '../ai-generated');
 const VAULT_PATH = 'C:/Users/johnd/OneDrive/Documents/Obsidian Vault';
 const PROJECT_CONTENT_DIRS = {
   'character': path.join(__dirname, '../src/content/characters'),
@@ -42,15 +44,28 @@ const AI_MAX_TOKENS = parseInt(process.env.AI_MAX_TOKENS) || 2000;
 class CampaignAIAgent {
   constructor() {
     this.knowledgeBase = new Map();
-    this.loadKnowledgeBase();
+    this.initialized = false;
+    this.initializeAsync();
   }
 
-  // Load all markdown files into knowledge base
-  loadKnowledgeBase() {
+  async initializeAsync() {
+    await this.loadKnowledgeBase();
+    this.initialized = true;
+  }
+
+  async ensureInitialized() {
+    if (!this.initialized) {
+      await this.initializeAsync();
+    }
+  }
+
+  // Load all markdown files and reference documents into knowledge base
+  async loadKnowledgeBase() {
     console.log('🧠 Loading campaign knowledge base from organized content directories...');
     
     this.knowledgeBase.clear();
     
+    // Load organized campaign content
     CONTENT_DIRS.forEach(contentDir => {
       if (!fs.existsSync(contentDir)) {
         console.log(`⚠️  Content directory not found: ${contentDir}`);
@@ -79,13 +94,127 @@ class CampaignAIAgent {
             tags,
             content: body,
             fullPath: filePath,
-            category: dirName, // Use directory name as category
-            type: this.getContentType(dirName)
+            category: dirName,
+            type: this.getContentType(dirName),
+            source: 'campaign-content'
           });
         });
     });
 
+    // Load reference documents
+    await this.loadReferenceDocuments();
+
     console.log(`✅ Loaded ${this.knowledgeBase.size} files into knowledge base`);
+  }
+
+  // Load reference documents (PDFs, text files, etc.)
+  async loadReferenceDocuments() {
+    if (!fs.existsSync(REFERENCE_DOCS_DIR)) {
+      console.log('📚 No reference-docs directory found, skipping reference documents');
+      return;
+    }
+
+    console.log('📚 Loading reference documents...');
+    const files = fs.readdirSync(REFERENCE_DOCS_DIR);
+    let successCount = 0;
+    let skipCount = 0;
+    
+    for (const file of files) {
+      const filePath = path.join(REFERENCE_DOCS_DIR, file);
+      
+      try {
+        const fileStats = fs.statSync(filePath);
+        
+        if (fileStats.isFile()) {
+          const ext = path.extname(file).toLowerCase();
+          const filename = path.basename(file, ext);
+          
+          let content = '';
+          let title = filename.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          
+          if (ext === '.pdf') {
+            console.log(`  Indexing PDF: ${file}...`);
+            // Just index the PDF metadata without parsing content
+            content = `Reference Document: ${title}
+            
+This is a PDF reference document available for the campaign. The AI can reference this document when generating content that might benefit from official rules, guidelines, or reference material contained within.
+
+File: ${file}
+Type: PDF Reference Document`;
+          } else if (ext === '.txt') {
+            console.log(`  Loading text file: ${file}...`);
+            content = fs.readFileSync(filePath, 'utf8');
+          } else if (ext === '.md') {
+            console.log(`  Loading markdown file: ${file}...`);
+            const markdownContent = fs.readFileSync(filePath, 'utf8');
+            const parsed = this.parseMarkdownFile(markdownContent);
+            title = parsed.title || title;
+            content = parsed.body;
+          } else {
+            continue; // Skip unsupported file types
+          }
+          
+          // Split large documents into chunks for better processing
+          const chunks = this.chunkLargeDocument(content, filename, title);
+          chunks.forEach((chunk, index) => {
+            const chunkKey = chunks.length > 1 ? `reference/${filename}-chunk${index + 1}` : `reference/${filename}`;
+            
+            this.knowledgeBase.set(chunkKey, {
+              filename: chunks.length > 1 ? `${filename} (Part ${index + 1})` : filename,
+              title: chunks.length > 1 ? `${title} (Part ${index + 1})` : title,
+              description: `Reference document: ${file}`,
+              tags: ['reference', 'rulebook', 'guide'],
+              content: chunk.content,
+              fullPath: filePath,
+              category: 'reference',
+              type: 'reference',
+              source: 'reference-document',
+              fileType: ext.slice(1),
+              chunkIndex: index,
+              totalChunks: chunks.length
+            });
+          });
+        }
+      } catch (error) {
+        console.log(`  ⚠️  Error processing file ${file}: ${error.message}`);
+      }
+    }
+  }
+
+  // Split large documents into manageable chunks
+  chunkLargeDocument(content, filename, title, maxChunkSize = 4000) {
+    if (content.length <= maxChunkSize) {
+      return [{ content, title, filename }];
+    }
+
+    const chunks = [];
+    const paragraphs = content.split('\n\n');
+    let currentChunk = '';
+    let chunkIndex = 0;
+
+    for (const paragraph of paragraphs) {
+      if (currentChunk.length + paragraph.length > maxChunkSize && currentChunk.length > 0) {
+        chunks.push({
+          content: currentChunk.trim(),
+          title: `${title} (Part ${chunkIndex + 1})`,
+          filename: `${filename}-chunk${chunkIndex + 1}`
+        });
+        currentChunk = paragraph;
+        chunkIndex++;
+      } else {
+        currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
+      }
+    }
+
+    if (currentChunk.trim()) {
+      chunks.push({
+        content: currentChunk.trim(),
+        title: chunks.length > 0 ? `${title} (Part ${chunkIndex + 1})` : title,
+        filename: chunks.length > 0 ? `${filename}-chunk${chunkIndex + 1}` : filename
+      });
+    }
+
+    return chunks;
   }
 
   // Parse markdown file and extract metadata
@@ -148,7 +277,7 @@ class CampaignAIAgent {
     return 'campaign';
   }
 
-  // Smart save function that determines the best location
+  // Smart save function that saves to ai-generated folder for manual review
   saveContent(content, filename = null, contentType = null, prompt = null) {
     // Detect content type if not provided
     if (!contentType && prompt) {
@@ -158,8 +287,9 @@ class CampaignAIAgent {
     // Generate filename if not provided
     if (!filename) {
       const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
+      const timeHMS = new Date().toISOString().split('T')[1].split('.')[0].replace(/:/g, '');
       const typePrefix = contentType ? contentType.toUpperCase() : 'CONTENT';
-      filename = `${typePrefix}_${timestamp}_AI_GENERATED.md`;
+      filename = `${typePrefix}_${timestamp}_${timeHMS}_AI_GENERATED.md`;
     }
     
     // Ensure .md extension
@@ -167,24 +297,13 @@ class CampaignAIAgent {
       filename += '.md';
     }
     
-    // Determine save path
-    let savePath;
-    let saveLocation;
-    
-    if (contentType && PROJECT_CONTENT_DIRS[contentType]) {
-      // Save to organized project structure
-      savePath = path.join(PROJECT_CONTENT_DIRS[contentType], filename);
-      saveLocation = `src/content/${contentType}s/${filename}`;
-    } else {
-      // Fallback to Obsidian vault
-      savePath = path.join(VAULT_PATH, filename);
-      saveLocation = `Obsidian Vault/${filename}`;
-    }
+    // Always save to ai-generated folder for manual review
+    const savePath = path.join(AI_GENERATED_DIR, filename);
+    const saveLocation = `ai-generated/${filename}`;
     
     // Create directory if it doesn't exist
-    const dir = path.dirname(savePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    if (!fs.existsSync(AI_GENERATED_DIR)) {
+      fs.mkdirSync(AI_GENERATED_DIR, { recursive: true });
     }
     
     // Save the file
@@ -194,7 +313,8 @@ class CampaignAIAgent {
       filename,
       savePath,
       saveLocation,
-      contentType
+      contentType,
+      suggestedFolder: contentType ? `src/content/${contentType}s/` : 'src/content/campaign/'
     };
   }
 
@@ -270,6 +390,8 @@ class CampaignAIAgent {
 
   // Generate content using OpenAI
   async generateContent(prompt, outputFile = null) {
+    await this.ensureInitialized();
+    
     try {
       console.log('🤖 Generating content with AI...');
       
@@ -291,18 +413,20 @@ class CampaignAIAgent {
 
 Campaign Setting: This appears to be a fantasy campaign involving the Atherian Empire, locations like Riverbend and Eldoria, and various NPCs and adventures.
 
+Available Reference Materials: You have access to reference documents including PDFs like the Daggerheart SRD, Equipment Sheets, Age of Umbra Adversaries, and other campaign materials. When relevant to the request, mention that players should "consult [specific document]" for detailed rules or mechanics.
+
 When creating content:
 1. Maintain consistency with existing lore and characters
-2. Use appropriate D&D 5e mechanics and terminology
+2. Use appropriate Daggerheart mechanics and terminology where applicable
 3. Create engaging, detailed descriptions
-4. Include relevant game mechanics when appropriate
+4. Reference available documents when players need detailed mechanics
 5. Format content as markdown with proper frontmatter for an Astro blog
 
 Always include proper frontmatter with:
 - title: A descriptive title
 - description: Brief summary
 - pubDate: Today's date (${new Date().toISOString().split('T')[0]})
-- tags: Relevant tags like ["dnd", "campaign", plus specific tags]`;
+- tags: Relevant tags like ["daggerheart", "campaign", plus specific tags]`;
 
       const userPrompt = `${prompt}${contextString}`;
 
@@ -325,6 +449,8 @@ Always include proper frontmatter with:
         saveResult = this.saveContent(generatedContent, outputFile, contentType, prompt);
         console.log(`✅ Content saved to: ${saveResult.saveLocation}`);
         console.log(`📁 Content type: ${saveResult.contentType}`);
+        console.log(`💡 Suggested destination: ${saveResult.suggestedFolder}`);
+        console.log(`🔧 To move: mv "${saveResult.saveLocation}" "${saveResult.suggestedFolder}"`);
       }
 
       return {
@@ -358,7 +484,9 @@ Always include proper frontmatter with:
   }
 
   // List files in knowledge base
-  listFiles(category = null) {
+  async listFiles(category = null) {
+    await this.ensureInitialized();
+    
     const files = Array.from(this.knowledgeBase.values());
     const filtered = category ? files.filter(f => f.category === category) : files;
     
@@ -379,7 +507,9 @@ Always include proper frontmatter with:
   }
 
   // Search existing content
-  searchContent(searchTerm) {
+  async searchContent(searchTerm) {
+    await this.ensureInitialized();
+    
     const results = this.getRelevantContext(searchTerm, 10);
     
     console.log(`\\n🔍 Search results for "${searchTerm}":`);

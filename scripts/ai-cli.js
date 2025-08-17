@@ -21,16 +21,22 @@ if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_a
 
 console.log('Available commands:');
 console.log('  📝 generate <prompt> - Generate new content based on your campaign');
-console.log('  💾 save <filename> - Save last generated content to your vault');
-console.log('  📋 list [category] - List knowledge base files');
-console.log('  🔍 search <term> - Search existing campaign content');
-console.log('  🔄 reload - Reload knowledge base from synced files');
+console.log('  💾 save <filename> - Save last generated content to organized directories');
+console.log('  📋 list [category] - List knowledge base files (includes reference docs)');
+console.log('  🔍 search <term> - Search existing campaign content and references');
+console.log('  🔄 reload - Reload knowledge base from content directories and reference docs');
 console.log('  ❌ exit - Exit the agent\n');
 
 console.log('💡 Examples:');
 console.log('  • generate Create a new NPC tavern owner for Riverbend');
 console.log('  • generate Design a side quest involving the Silverstream River');
-console.log('  • generate Write a description for a haunted forest near Eldoria\n');
+console.log('  • generate Write a description for a haunted forest near Eldoria');
+console.log('  • list reference - Show loaded reference documents\n');
+
+console.log('📚 Reference Documents:');
+console.log('  • Place PDF files in the reference-docs/ directory');
+console.log('  • Supported formats: PDF, TXT, MD');
+console.log('  • Reference materials are automatically indexed for AI context\n');
 
 function prompt(question) {
   return new Promise((resolve) => {
@@ -106,7 +112,7 @@ async function handleCommand(input) {
 
       case 'list':
       case 'l':
-        agent.listFiles(argument || null);
+        await agent.listFiles(argument || null);
         break;
 
       case 'search':
@@ -114,21 +120,23 @@ async function handleCommand(input) {
           console.log('❌ Please provide a search term. Example: search Riverbend');
           break;
         }
-        agent.searchContent(argument);
+        await agent.searchContent(argument);
         break;
 
       case 'reload':
       case 'r':
-        agent.loadKnowledgeBase();
+        console.log('🔄 Reloading knowledge base...');
+        await agent.loadKnowledgeBase();
+        console.log('✅ Knowledge base reloaded');
         break;
 
       case 'help':
       case 'h':
         console.log('\n📝 generate <prompt> - Generate new content');
         console.log('💾 save <filename> - Save last generated content');
-        console.log('📋 list [category] - List files (categories: character, location, adventure, monster, item, environment, campaign, misc)');
-        console.log('🔍 search <term> - Search existing content');
-        console.log('🔄 reload - Reload knowledge base');
+        console.log('📋 list [category] - List files (categories: character, location, adventure, monster, item, environment, campaign, reference)');
+        console.log('🔍 search <term> - Search existing content and reference documents');
+        console.log('🔄 reload - Reload knowledge base including reference docs');
         console.log('❌ exit - Exit the agent\n');
         break;
 
