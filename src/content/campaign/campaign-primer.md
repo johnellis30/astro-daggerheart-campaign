@@ -4,12 +4,10 @@ description: "You are on Yolen, a planet simmering with tension."
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","lore","campaign"]
 heroImage: "/blog-placeholder-4.jpg"
-gmOnly: true
-playerVisible: false
+gmOnly: false
 ---
-
-
 # Campaign Primer
+
 *Campaign Information*
 
 # WELCOME TO YOLEN: A DAGGERHEART CAMPAIGN PRIMER
@@ -20,8 +18,8 @@ You are on Yolen, a planet simmering with tension. The continent of Eldoria is h
 
 ## The Factions
 
-*   **Atheria**: A powerful empire that values Stability, Advancement, and Influence. They believe in order, progress, and the rule of law.
-*   **Sylvani**: A kingdom deeply connected to the natural world, valuing Freedom, Harmony, and Preservation. They believe in living in balance with nature and respecting ancient traditions.
+* **Atheria**: A powerful empire that values Stability, Advancement, and Influence. They believe in order, progress, and the rule of law.
+* **Sylvani**: A kingdom deeply connected to the natural world, valuing Freedom, Harmony, and Preservation. They believe in living in balance with nature and respecting ancient traditions.
 
 ## The Conflict
 
@@ -34,7 +32,8 @@ You begin your journey in Riverbend, a region caught between Atheria and Sylvani
 ## Ancestries of Yolen
 
 Yolen is home to a diverse range of ancestries:
-*   **Ancestries:** Human, Elf, Dwarf, Goblin, Halfling, Orc, Clank, Drakona, Faerie, Faun, Firbolg, Fungril, Galapa, Giant, Infernis, Katari, Ribbet, Simiah
+
+* **Ancestries:** Human, Elf, Dwarf, Goblin, Halfling, Orc, Clank, Drakona, Faerie, Faun, Firbolg, Fungril, Galapa, Giant, Infernis, Katari, Ribbet, Simiah
 
 ## Your Role
 
