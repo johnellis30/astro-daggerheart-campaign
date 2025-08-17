@@ -3,9 +3,10 @@ title: The Whispering Watchtower
 description: A haunted relic near Riverbend, the Whispering Watchtower offers both danger and discovery for those brave enough to explore its secrets.
 pubDate: 2025-08-17
 tags: ["daggerheart", "campaign", "Riverbend", "haunted locations"]
+gmOnly: true
 ---
-
 # The Whispering Watchtower
+
 *Haunted Relic of the Atherian Steppes*
 
 ## Location: Near the Edge of Riverbend
@@ -21,12 +22,15 @@ Perched ominously on a forgotten hillock at the edge where the Sylvani Woods' sh
 ## Notable Features
 
 ### The Whispering Hall
+
 The second floor, known as the Whispering Hall, is infamous for its auditory illusions. Adventurers report hearing hushed conversations and footsteps following them, though no source can ever be found. Some believe these whispers are the spirits of soldiers left to guard an outpost that the empire forgot.
 
 ### The Shimmering Veil
+
 On rare moonlit nights, the top floor bathes in a ghostly light that seems to pierce the veil between worlds. It is here that the tower's most valuable secret lies hidden—a portal to the Ethereal Plane, unstable and unpredictable. Those who dare to explore this phenomenon find their surroundings momentarily shifting, revealing glimpses of parallel realities or the tower in its former glory.
 
 ### The Keeper's Quarters
+
 The basement, or the Keeper's Quarters, is rumored to house the spirit of the last watch commander, bound to protect the tower's secrets even in death. Ancient texts, artifacts, and possibly cursed items are believed to be hidden amidst the rubble, guarded by spectral forces.
 
 ## Adventures and Encounters

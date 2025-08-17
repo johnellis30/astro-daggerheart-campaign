@@ -4,11 +4,10 @@ description: "Hidden within the decrepit outpost, Valerius's laboratory is a mak
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","location","worldbuilding"]
 heroImage: "/blog-placeholder-3.jpg"
-playerVisible: true
+gmOnly: true
 ---
-
-
 # Valerius Laboratory
+
 *Campaign Location*
 
 # Location: Valerius's Hidden Laboratory

@@ -4,10 +4,11 @@ description: "Yolen is a planet in the Cosmere, the original home of humanity an
 pubDate: "2025-08-16"
 tags: ["dnd","campaign"]
 heroImage: "/blog-placeholder-1.jpg"
+
+gmOnly: true
 ---
-
-
 # Overall Yolen
+
 *Campaign Content*
 
 Yolen is a planet in the Cosmere, the original home of humanity and the location where Adonalsium was shattered. In this pre-Shattering era, Yolen is teeming with untamed investiture.

@@ -4,11 +4,10 @@ description: "An unnamed and long-forgotten structure stands as a testament to a
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","location","worldbuilding"]
 heroImage: "/blog-placeholder-about.jpg"
-playerVisible: true
+gmOnly: true
 ---
-
-
 # Decrepit Outpost
+
 *Campaign Location*
 
 # Location: Decrepit Outpost

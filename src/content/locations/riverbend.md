@@ -6,12 +6,12 @@ tags: ["dnd","campaign","location","worldbuilding"]
 heroImage: "/images/locations/riverbend.jpg"
 playerVisible: true
 ---
-
-
 # Riverbend
+
 *Campaign Location*
 
 # Riverbend Valley
+
 *A Crossroads of Culture and Conflict*
 
 ## Overview
@@ -21,13 +21,16 @@ Riverbend is a lush valley nestled between the mystical Sylvani Woods and the ex
 ## Geography & Features
 
 ### The Silverstream River
+
 The lifeblood of the valley, this crystal-clear river provides:
+
 - **Fresh water** for all inhabitants
-- **Transportation routes** for trade and travel  
+- **Transportation routes** for trade and travel
 - **Fertile soil** along its banks
 - **Natural borders** between different communities
 
 ### Terrain
+
 - **Rolling hills** covered in wildflowers and grass
 - **Dense woodlands** on the western edge
 - **Farmland** in the central valley
@@ -36,12 +39,14 @@ The lifeblood of the valley, this crystal-clear river provides:
 ## Settlements & Communities
 
 ### Human Settlements
+
 - **Architecture:** Sturdy stone buildings with thatched roofs
 - **Economy:** Bustling marketplaces and merchant trade
 - **Culture:** Hardworking farmers and skilled artisans
 - **Politics:** Increasingly divided loyalties
 
-### Elven Villages  
+### Elven Villages
+
 - **Architecture:** Homes that blend seamlessly with the forest
 - **Economy:** Craftsmanship and forest resources
 - **Culture:** Deep connection to nature and ancient traditions
@@ -50,14 +55,18 @@ The lifeblood of the valley, this crystal-clear river provides:
 ## Political Tensions
 
 ### The Imperial Presence
+
 The Atherian Empire's influence grows stronger through:
+
 - **Imperial garrisons** stationed throughout the valley
 - **Resource extraction** flowing eastward to the Empire
 - **Political pressure** on local leaders
 - **Recruitment efforts** among human populations
 
 ### Sylvani Resistance
+
 The elven communities maintain independence via:
+
 - **Forest rangers** watching Imperial movements
 - **Cultural preservation** of ancient ways
 - **Subtle defiance** of Imperial mandates
@@ -66,6 +75,7 @@ The elven communities maintain independence via:
 ## Current Conflicts
 
 As war looms on the horizon, Riverbend faces:
+
 - **Divided loyalties** among its people
 - **Increased militarization** from both sides
 - **Economic strain** from resource demands
@@ -74,6 +84,7 @@ As war looms on the horizon, Riverbend faces:
 ## Adventure Opportunities
 
 ### For Player Characters
+
 - **Diplomatic missions** between feuding factions
 - **Smuggling operations** across territorial lines
 - **Ancient mysteries** hidden in the valley's depths
@@ -81,6 +92,7 @@ As war looms on the horizon, Riverbend faces:
 - **Resource protection** from exploitation
 
 ### Key Locations
+
 - **River crossings** - strategic chokepoints
 - **Hidden caves** - smuggler routes and ancient sites
 - **Market towns** - information and supply hubs
@@ -89,8 +101,8 @@ As war looms on the horizon, Riverbend faces:
 ## Notable Features
 
 - **The Tear of the Moon Shrine** - Sacred site guarded by Elara Meadowlight
-- **The Old Bridge** - Ancient stone crossing with defensive potential  
-- **Merchant's Rest** - Popular tavern and information exchange
+- **The Old Bridge** - Ancient stone crossing with defensive potential
+- **The Whispering Willow Tavern** - Popular tavern and information exchange
 - **The Whispering Woods** - Forest edge where rangers gather intelligence
 
 ---

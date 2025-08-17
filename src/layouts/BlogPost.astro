@@ -6,9 +6,51 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import ViewToggle from '../components/ViewToggle.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+type Props = {
+	title: string;
+	description: string;
+	pubDate: Date;
+	updatedDate?: Date;
+	heroImage?: string;
+	backUrl?: string;
+	backLabel?: string;
+};
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, backUrl, backLabel } = Astro.props;
+
+// Determine back URL and label based on current path if not provided
+const currentPath = Astro.url.pathname;
+let defaultBackUrl = '/';
+let defaultBackLabel = 'Back to Home';
+
+if (currentPath.includes('/characters/')) {
+	defaultBackUrl = '/characters';
+	defaultBackLabel = 'Back to Characters';
+} else if (currentPath.includes('/locations/')) {
+	defaultBackUrl = '/locations';
+	defaultBackLabel = 'Back to Locations';
+} else if (currentPath.includes('/monsters/')) {
+	defaultBackUrl = '/monsters';
+	defaultBackLabel = 'Back to Monsters';
+} else if (currentPath.includes('/items/')) {
+	defaultBackUrl = '/items';
+	defaultBackLabel = 'Back to Items';
+} else if (currentPath.includes('/adventures/')) {
+	defaultBackUrl = '/adventures';
+	defaultBackLabel = 'Back to Adventures';
+} else if (currentPath.includes('/campaign/')) {
+	defaultBackUrl = '/campaign';
+	defaultBackLabel = 'Back to Campaign';
+} else if (currentPath.includes('/environments/')) {
+	defaultBackUrl = '/environments';
+	defaultBackLabel = 'Back to Environments';
+} else if (currentPath.includes('/blog/')) {
+	defaultBackUrl = '/blog';
+	defaultBackLabel = 'Back to Blog';
+}
+
+const finalBackUrl = backUrl || defaultBackUrl;
+const finalBackLabel = backLabel || defaultBackLabel;
 ---
 
 <html lang="en">
@@ -52,6 +94,26 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			.last-updated-on {
 				font-style: italic;
 			}
+			.back-button {
+				display: inline-block;
+				margin-bottom: 2rem;
+				padding: 0.75rem 1.5rem;
+				background: #2337ff;
+				color: white;
+				text-decoration: none;
+				border-radius: 6px;
+				font-weight: 500;
+				transition: background-color 0.3s ease;
+				border: 2px solid #2337ff;
+			}
+			.back-button:hover {
+				background: #000d8a;
+				border-color: #000d8a;
+			}
+			.back-button::before {
+				content: '← ';
+				margin-right: 0.5rem;
+			}
 		</style>
 	</head>
 
@@ -64,6 +126,17 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 					{heroImage && <img width={1020} height={510} src={heroImage} alt="" />}
 				</div>
 				<div class="prose">
+					<a href={finalBackUrl} style="
+						display: inline-block;
+						margin-bottom: 2rem;
+						padding: 0.75rem 1.5rem;
+						background: #2337ff;
+						color: white;
+						text-decoration: none;
+						border-radius: 6px;
+						font-weight: 500;
+						transition: background-color 0.3s ease;
+					" onmouseover="this.style.background='#000d8a'" onmouseout="this.style.background='#2337ff'">← {finalBackLabel}</a>
 					<div class="title">
 						<div class="date">
 							<FormattedDate date={pubDate} />
