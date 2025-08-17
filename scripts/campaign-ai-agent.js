@@ -26,6 +26,15 @@ const CONTENT_DIRS = [
   path.join(__dirname, '../src/content/environments')
 ];
 const VAULT_PATH = 'C:/Users/johnd/OneDrive/Documents/Obsidian Vault';
+const PROJECT_CONTENT_DIRS = {
+  'character': path.join(__dirname, '../src/content/characters'),
+  'location': path.join(__dirname, '../src/content/locations'),
+  'adventure': path.join(__dirname, '../src/content/adventures'),
+  'monster': path.join(__dirname, '../src/content/monsters'),
+  'item': path.join(__dirname, '../src/content/items'),
+  'environment': path.join(__dirname, '../src/content/environments'),
+  'campaign': path.join(__dirname, '../src/content/campaign')
+};
 const AI_MODEL = process.env.AI_MODEL || 'gpt-4-turbo-preview';
 const AI_TEMPERATURE = parseFloat(process.env.AI_TEMPERATURE) || 0.7;
 const AI_MAX_TOKENS = parseInt(process.env.AI_MAX_TOKENS) || 2000;
@@ -113,6 +122,80 @@ class CampaignAIAgent {
   extractFrontmatterField(frontmatter, field) {
     const match = frontmatter.match(new RegExp(`${field}:\\s*["']?(.*?)["']?$`, 'm'));
     return match ? match[1].trim() : null;
+  }
+
+  // Detect content type from prompt
+  detectContentType(prompt) {
+    const promptLower = prompt.toLowerCase();
+    
+    // Check for explicit type mentions
+    if (promptLower.includes('npc') || promptLower.includes('character')) return 'character';
+    if (promptLower.includes('location') || promptLower.includes('place') || promptLower.includes('town') || promptLower.includes('city')) return 'location';
+    if (promptLower.includes('adventure') || promptLower.includes('quest') || promptLower.includes('mission')) return 'adventure';
+    if (promptLower.includes('monster') || promptLower.includes('creature') || promptLower.includes('beast') || promptLower.includes('adversary')) return 'monster';
+    if (promptLower.includes('item') || promptLower.includes('artifact') || promptLower.includes('weapon') || promptLower.includes('armor') || promptLower.includes('loot')) return 'item';
+    if (promptLower.includes('environment') || promptLower.includes('terrain') || promptLower.includes('biome')) return 'environment';
+    if (promptLower.includes('campaign') || promptLower.includes('lore') || promptLower.includes('history') || promptLower.includes('background')) return 'campaign';
+    
+    // Check for creation verbs that might indicate type
+    if (promptLower.match(/create.*(?:npc|character|person|villager|merchant|guard)/)) return 'character';
+    if (promptLower.match(/create.*(?:location|place|town|city|dungeon|temple)/)) return 'location';
+    if (promptLower.match(/create.*(?:adventure|quest|mission|scenario)/)) return 'adventure';
+    if (promptLower.match(/create.*(?:monster|creature|beast|enemy)/)) return 'monster';
+    if (promptLower.match(/create.*(?:item|artifact|weapon|armor|treasure)/)) return 'item';
+    
+    // Default fallback
+    return 'campaign';
+  }
+
+  // Smart save function that determines the best location
+  saveContent(content, filename = null, contentType = null, prompt = null) {
+    // Detect content type if not provided
+    if (!contentType && prompt) {
+      contentType = this.detectContentType(prompt);
+    }
+    
+    // Generate filename if not provided
+    if (!filename) {
+      const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
+      const typePrefix = contentType ? contentType.toUpperCase() : 'CONTENT';
+      filename = `${typePrefix}_${timestamp}_AI_GENERATED.md`;
+    }
+    
+    // Ensure .md extension
+    if (!filename.endsWith('.md')) {
+      filename += '.md';
+    }
+    
+    // Determine save path
+    let savePath;
+    let saveLocation;
+    
+    if (contentType && PROJECT_CONTENT_DIRS[contentType]) {
+      // Save to organized project structure
+      savePath = path.join(PROJECT_CONTENT_DIRS[contentType], filename);
+      saveLocation = `src/content/${contentType}s/${filename}`;
+    } else {
+      // Fallback to Obsidian vault
+      savePath = path.join(VAULT_PATH, filename);
+      saveLocation = `Obsidian Vault/${filename}`;
+    }
+    
+    // Create directory if it doesn't exist
+    const dir = path.dirname(savePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    
+    // Save the file
+    fs.writeFileSync(savePath, content);
+    
+    return {
+      filename,
+      savePath,
+      saveLocation,
+      contentType
+    };
   }
 
   // Get content type from directory name
@@ -235,17 +318,20 @@ Always include proper frontmatter with:
 
       const generatedContent = response.choices[0].message.content;
 
-      // Save to file if specified
+      // Smart save to appropriate directory
+      let saveResult = null;
       if (outputFile) {
-        const outputPath = path.join(VAULT_PATH, outputFile);
-        fs.writeFileSync(outputPath, generatedContent);
-        console.log(`✅ Content saved to: ${outputFile}`);
+        const contentType = this.detectContentType(prompt);
+        saveResult = this.saveContent(generatedContent, outputFile, contentType, prompt);
+        console.log(`✅ Content saved to: ${saveResult.saveLocation}`);
+        console.log(`📁 Content type: ${saveResult.contentType}`);
       }
 
       return {
         content: generatedContent,
         relevantFiles: relevantFiles.map(f => ({ title: f.title, category: f.category })),
-        tokensUsed: response.usage?.total_tokens || 0
+        tokensUsed: response.usage?.total_tokens || 0,
+        saveResult: saveResult
       };
 
     } catch (error) {

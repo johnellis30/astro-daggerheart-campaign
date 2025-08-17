@@ -9,6 +9,7 @@ const rl = readline.createInterface({
 });
 
 let lastGeneratedContent = null;
+let lastPrompt = null;
 
 console.log('🎲 D&D Campaign AI Agent');
 console.log('=========================\n');
@@ -68,7 +69,9 @@ async function handleCommand(input) {
         }
         
         lastGeneratedContent = result.content;
-        console.log('\n💡 Use "save <filename>" to save this content to your vault');
+        lastPrompt = argument;
+        console.log('\n💡 Use "save <filename>" to save this content to the organized directory structure');
+        console.log('💡 Or use "save" without filename to auto-generate filename and location');
         break;
 
       case 'save':
@@ -78,22 +81,27 @@ async function handleCommand(input) {
           break;
         }
         
+        let saveResult;
         if (!argument) {
-          console.log('❌ Please provide a filename. Example: save NEW_NPC_TAVERN_KEEPER.md');
-          break;
+          // Auto-generate filename and save to appropriate directory
+          saveResult = agent.saveContent(lastGeneratedContent, null, null, lastPrompt);
+          console.log(`✅ Content auto-saved to: ${saveResult.saveLocation}`);
+          console.log(`📁 Content type: ${saveResult.contentType}`);
+          console.log(`📝 Filename: ${saveResult.filename}`);
+        } else {
+          // Use provided filename
+          let filename = argument;
+          if (!filename.endsWith('.md')) {
+            filename += '.md';
+          }
+          
+          const contentType = agent.detectContentType(lastPrompt || '');
+          saveResult = agent.saveContent(lastGeneratedContent, filename, contentType, lastPrompt);
+          console.log(`✅ Content saved to: ${saveResult.saveLocation}`);
+          console.log(`📁 Content type: ${saveResult.contentType}`);
         }
         
-        let filename = argument;
-        if (!filename.endsWith('.md')) {
-          filename += '.md';
-        }
-        
-        const vaultPath = 'C:/Users/johnd/OneDrive/Documents/Obsidian Vault';
-        const filePath = path.join(vaultPath, filename);
-        
-        fs.writeFileSync(filePath, lastGeneratedContent);
-        console.log(`✅ Content saved to: ${filename}`);
-        console.log('💡 Run "npm run sync-obsidian" to sync it to your blog');
+        console.log('💡 Content is now part of your organized campaign structure and ready for the website!');
         break;
 
       case 'list':
