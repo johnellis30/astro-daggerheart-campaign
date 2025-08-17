@@ -1,6 +1,6 @@
 # AI Generated Content
 
-This folder contains all newly generated content from the Campaign AI Agent. 
+This folder contains all newly generated content from the Campaign AI Agent, including both **text content** and **images**.
 
 ## Purpose
 
@@ -8,10 +8,10 @@ All AI-generated content is saved here first for **manual review and organizatio
 
 ## Workflow
 
-1. **Generate**: AI creates content and saves it here
+1. **Generate**: AI creates content/images and saves them here
 2. **Review**: Check the generated content for quality and accuracy
-3. **Edit**: Make any necessary adjustments
-4. **Move**: Move the file to the appropriate folder:
+3. **Edit**: Make any necessary adjustments to text content
+4. **Move**: Move the files to the appropriate folders:
    - Characters → `src/content/characters/`
    - Locations → `src/content/locations/` 
    - Adventures → `src/content/adventures/`
@@ -19,20 +19,35 @@ All AI-generated content is saved here first for **manual review and organizatio
    - Items → `src/content/items/`
    - Environments → `src/content/environments/`
    - Campaign lore → `src/content/campaign/`
+   - **Images → `public/images/`**
 
-## File Naming Convention
+## File Types & Naming
 
-Generated files follow this pattern:
+**Text Content:**
 - `{TYPE}_{DATE}_{TIME}_AI_GENERATED.md`
 - Example: `CHARACTER_20250816_142330_AI_GENERATED.md`
 
-## Tips
+**Images:**
+- `{NAME}_{DATE}_{TIME}.png`
+- Example: `tavern-interior_20250817_023152.png`
 
-- The AI agent will suggest the destination folder for each generated file
-- Review content for consistency with your campaign world
-- Feel free to edit and customize the generated content before moving it
-- Delete any files you don't want to keep
+## Image Generation Features
 
-## Moving Files
+- **DALL-E 3** powered image generation
+- **Fantasy art style** optimized for D&D campaigns
+- **1024x1024 resolution** for high quality
+- **Automatic enhancement** of prompts for better results
+- **Local saving** for easy organization
 
-You can use the suggested move commands printed by the AI agent, or simply drag and drop files to the appropriate folders.
+## Organization Tool
+
+Use the interactive organizer to manage both text and image files:
+```bash
+npm run organize-ai
+```
+
+This tool can:
+- Preview files before moving
+- Auto-detect content types (including images)
+- Rename files during organization
+- Handle both text and image files

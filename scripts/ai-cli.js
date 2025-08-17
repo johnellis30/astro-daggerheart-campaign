@@ -21,6 +21,8 @@ if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_a
 
 console.log('Available commands:');
 console.log('  📝 generate <prompt> - Generate new content based on your campaign');
+console.log('  🎨 image <prompt> [filename] - Generate image using DALL-E 3');
+console.log('  🎲 both <prompt> [content-file] [image-file] - Generate both content and image');
 console.log('  💾 save <filename> - Save last generated content to organized directories');
 console.log('  📋 list [category] - List knowledge base files (includes reference docs)');
 console.log('  🔍 search <term> - Search existing campaign content and references');
@@ -29,6 +31,8 @@ console.log('  ❌ exit - Exit the agent\n');
 
 console.log('💡 Examples:');
 console.log('  • generate Create a new NPC tavern owner for Riverbend');
+console.log('  • image A mysterious hooded figure in a tavern');
+console.log('  • both Design a haunted watchtower near Riverbend');
 console.log('  • generate Design a side quest involving the Silverstream River');
 console.log('  • generate Write a description for a haunted forest near Eldoria');
 console.log('  • list reference - Show loaded reference documents\n');
@@ -146,6 +150,67 @@ async function handleCommand(input) {
         console.log('👋 Goodbye! Happy campaigning!');
         rl.close();
         process.exit(0);
+        break;
+
+      case 'image':
+      case 'img':
+        if (!argument) {
+          console.log('❌ Please provide a prompt. Example: image A mysterious tavern keeper');
+          break;
+        }
+        
+        console.log('🎨 Generating image...');
+        const parts = argument.split(' ');
+        const filename = parts.length > 3 ? parts.pop() : null;
+        const imagePrompt = filename ? parts.join(' ') : argument;
+        
+        const imageResult = await agent.generateImage(imagePrompt, filename);
+        
+        console.log('\n🖼️  Image Generated:');
+        console.log('=' .repeat(50));
+        console.log(`🌐 URL: ${imageResult.imageUrl}`);
+        if (imageResult.localPath) {
+          console.log(`📁 Saved to: ${imageResult.saveLocation}`);
+          console.log(`💡 Suggested destination: ${imageResult.suggestedFolder}`);
+        }
+        console.log('=' .repeat(50));
+        
+        lastGeneratedContent = `![Generated Image](${imageResult.imageUrl})`;
+        break;
+
+      case 'both':
+      case 'content+image':
+        if (!argument) {
+          console.log('❌ Please provide a prompt. Example: both Create a mysterious merchant NPC');
+          break;
+        }
+        
+        console.log('🎲 Generating content and image...');
+        const bothResult = await agent.generateContentWithImage(argument);
+        
+        console.log('\n📄 Generated Content:');
+        console.log('=' .repeat(50));
+        console.log(bothResult.content.content);
+        console.log('=' .repeat(50));
+        
+        console.log('\n🖼️  Generated Image:');
+        console.log('=' .repeat(50));
+        console.log(`🌐 URL: ${bothResult.image.imageUrl}`);
+        if (bothResult.image.localPath) {
+          console.log(`📁 Image saved to: ${bothResult.image.saveLocation}`);
+        }
+        console.log('=' .repeat(50));
+        
+        console.log(`\n📊 Used ${bothResult.content.tokensUsed} tokens`);
+        
+        if (bothResult.content.relevantFiles.length > 0) {
+          console.log('\n🔗 Referenced files:');
+          bothResult.content.relevantFiles.forEach(file => {
+            console.log(`  • ${file.title} (${file.category})`);
+          });
+        }
+        
+        lastGeneratedContent = bothResult.content.content;
         break;
 
       default:

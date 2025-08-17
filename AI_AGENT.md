@@ -33,17 +33,20 @@ npm run ai-cli
 ```
 
 Available commands:
-- `generate <prompt>` - Generate new content
+- `generate <prompt>` - Generate new text content
+- `image <prompt> [filename]` - Generate images with DALL-E 3
+- `both <prompt>` - Generate both content and image together
 - `save <filename>` - Save generated content to your vault  
 - `list [category]` - Browse your knowledge base
 - `search <term>` - Find relevant existing content
 - `reload` - Refresh knowledge base
 - `exit` - Quit
 
-### One-off Generation
+### Direct Generation Commands
 Generate content directly:
 ```bash
 npm run ai-generate "Create a new NPC tavern owner for Riverbend"
+npm run ai-image "A mysterious hooded figure in a tavern"
 npm run ai-generate "Design a haunted forest" LOCATION_HAUNTED_FOREST.md
 ```
 

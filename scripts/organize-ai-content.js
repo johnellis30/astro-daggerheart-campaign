@@ -17,7 +17,8 @@ const CONTENT_DIRS = {
   'monster': './src/content/monsters',
   'item': './src/content/items',
   'environment': './src/content/environments',
-  'campaign': './src/content/campaign'
+  'campaign': './src/content/campaign',
+  'image': './public/images'
 };
 
 function prompt(question) {
@@ -28,6 +29,7 @@ function prompt(question) {
 
 function detectContentType(filename) {
   const lower = filename.toLowerCase();
+  if (lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image';
   if (lower.includes('character') || lower.includes('npc')) return 'character';
   if (lower.includes('location') || lower.includes('place')) return 'location';
   if (lower.includes('adventure') || lower.includes('quest')) return 'adventure';
@@ -46,7 +48,10 @@ async function organizeFiles() {
     process.exit(1);
   }
 
-  const files = fs.readdirSync(AI_GENERATED_DIR).filter(f => f.endsWith('.md') && f !== 'README.md');
+  const files = fs.readdirSync(AI_GENERATED_DIR).filter(f => 
+    (f.endsWith('.md') || f.endsWith('.png') || f.endsWith('.jpg') || f.endsWith('.jpeg')) && 
+    f !== 'README.md'
+  );
   
   if (files.length === 0) {
     console.log('✅ No files to organize!');

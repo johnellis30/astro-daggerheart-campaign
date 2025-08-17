@@ -466,6 +466,99 @@ Always include proper frontmatter with:
     }
   }
 
+  // Generate image using DALL-E
+  async generateImage(prompt, outputFilename = null, style = 'fantasy') {
+    await this.ensureInitialized();
+    
+    try {
+      console.log('🎨 Generating image with DALL-E...');
+      
+      // Enhance prompt for D&D fantasy style
+      const enhancedPrompt = `${prompt}, fantasy art style, detailed, cinematic lighting, digital painting, concept art for dungeons and dragons campaign`;
+      
+      console.log(`🖼️  Image prompt: "${enhancedPrompt}"`);
+      
+      const response = await openai.images.generate({
+        model: "dall-e-3",
+        prompt: enhancedPrompt,
+        n: 1,
+        size: "1024x1024",
+        quality: "standard",
+        response_format: "url"
+      });
+
+      const imageUrl = response.data[0].url;
+      
+      // Download and save the image
+      if (outputFilename) {
+        const imageResponse = await fetch(imageUrl);
+        const arrayBuffer = await imageResponse.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        
+        // Generate filename if not provided
+        let filename = outputFilename;
+        if (!filename.includes('.')) {
+          const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
+          const timeHMS = new Date().toISOString().split('T')[1].split('.')[0].replace(/:/g, '');
+          filename = `${filename}_${timestamp}_${timeHMS}.png`;
+        }
+        
+        // Save to ai-generated folder
+        const savePath = path.join(AI_GENERATED_DIR, filename);
+        
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(AI_GENERATED_DIR)) {
+          fs.mkdirSync(AI_GENERATED_DIR, { recursive: true });
+        }
+        
+        fs.writeFileSync(savePath, buffer);
+        
+        return {
+          imageUrl,
+          localPath: savePath,
+          filename,
+          saveLocation: `ai-generated/${filename}`,
+          suggestedFolder: 'public/images/'
+        };
+      }
+      
+      return {
+        imageUrl,
+        message: 'Image generated successfully! Use the URL to download manually.'
+      };
+
+    } catch (error) {
+      console.error('❌ Error generating image:', error.message);
+      throw error;
+    }
+  }
+
+  // Generate both content and image for campaign elements
+  async generateContentWithImage(prompt, contentFilename = null, imageFilename = null) {
+    await this.ensureInitialized();
+    
+    try {
+      console.log('🎲 Generating content and image...');
+      
+      // Generate text content first
+      const contentResult = await this.generateContent(prompt, contentFilename);
+      
+      // Generate complementary image
+      const imagePrompt = `${prompt}, showing the subject described in the text content`;
+      const imageResult = await this.generateImage(imagePrompt, imageFilename);
+      
+      return {
+        content: contentResult,
+        image: imageResult,
+        combined: true
+      };
+
+    } catch (error) {
+      console.error('❌ Error generating content with image:', error.message);
+      throw error;
+    }
+  }
+
   // Interactive CLI mode
   async startInteractiveMode() {
     console.log('🎲 Campaign AI Agent - Interactive Mode');
