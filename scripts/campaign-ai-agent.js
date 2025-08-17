@@ -16,7 +16,15 @@ const openai = new OpenAI({
 });
 
 // Configuration
-const OBSIDIAN_CONTENT_DIR = path.join(__dirname, '../src/content/blog/obsidian');
+const CONTENT_DIRS = [
+  path.join(__dirname, '../src/content/characters'),
+  path.join(__dirname, '../src/content/locations'),
+  path.join(__dirname, '../src/content/adventures'),
+  path.join(__dirname, '../src/content/monsters'),
+  path.join(__dirname, '../src/content/items'),
+  path.join(__dirname, '../src/content/campaign'),
+  path.join(__dirname, '../src/content/environments')
+];
 const VAULT_PATH = 'C:/Users/johnd/OneDrive/Documents/Obsidian Vault';
 const AI_MODEL = process.env.AI_MODEL || 'gpt-4-turbo-preview';
 const AI_TEMPERATURE = parseFloat(process.env.AI_TEMPERATURE) || 0.7;
@@ -30,35 +38,43 @@ class CampaignAIAgent {
 
   // Load all markdown files into knowledge base
   loadKnowledgeBase() {
-    console.log('🧠 Loading campaign knowledge base...');
+    console.log('🧠 Loading campaign knowledge base from organized content directories...');
     
-    if (!fs.existsSync(OBSIDIAN_CONTENT_DIR)) {
-      console.log('⚠️  Obsidian content directory not found. Run sync first.');
-      return;
-    }
+    this.knowledgeBase.clear();
+    
+    CONTENT_DIRS.forEach(contentDir => {
+      if (!fs.existsSync(contentDir)) {
+        console.log(`⚠️  Content directory not found: ${contentDir}`);
+        return;
+      }
 
-    const files = fs.readdirSync(OBSIDIAN_CONTENT_DIR, { recursive: true });
-    
-    files
-      .filter(file => path.extname(file) === '.md')
-      .forEach(file => {
-        const filePath = path.join(OBSIDIAN_CONTENT_DIR, file);
-        const content = fs.readFileSync(filePath, 'utf8');
-        const filename = path.basename(file, '.md');
-        
-        // Extract key information
-        const { title, description, tags, body } = this.parseMarkdownFile(content);
-        
-        this.knowledgeBase.set(filename, {
-          filename,
-          title,
-          description,
-          tags,
-          content: body,
-          fullPath: filePath,
-          category: this.categorizeFile(filename)
+      const dirName = path.basename(contentDir);
+      console.log(`  Loading ${dirName}...`);
+      
+      const files = fs.readdirSync(contentDir);
+      
+      files
+        .filter(file => path.extname(file) === '.md')
+        .forEach(file => {
+          const filePath = path.join(contentDir, file);
+          const content = fs.readFileSync(filePath, 'utf8');
+          const filename = path.basename(file, '.md');
+          
+          // Extract key information
+          const { title, description, tags, body } = this.parseMarkdownFile(content);
+          
+          this.knowledgeBase.set(`${dirName}/${filename}`, {
+            filename,
+            title,
+            description,
+            tags,
+            content: body,
+            fullPath: filePath,
+            category: dirName, // Use directory name as category
+            type: this.getContentType(dirName)
+          });
         });
-      });
+    });
 
     console.log(`✅ Loaded ${this.knowledgeBase.size} files into knowledge base`);
   }
@@ -99,7 +115,21 @@ class CampaignAIAgent {
     return match ? match[1].trim() : null;
   }
 
-  // Categorize files based on filename patterns
+  // Get content type from directory name
+  getContentType(dirName) {
+    const typeMap = {
+      'characters': 'character',
+      'locations': 'location', 
+      'adventures': 'adventure',
+      'monsters': 'monster',
+      'items': 'item',
+      'environments': 'environment',
+      'campaign': 'campaign'
+    };
+    return typeMap[dirName] || 'misc';
+  }
+
+  // Categorize files based on filename patterns (legacy support)
   categorizeFile(filename) {
     if (filename.startsWith('NPC_')) return 'character';
     if (filename.startsWith('LOCATION_')) return 'location';

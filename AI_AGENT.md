@@ -16,11 +16,13 @@ This AI agent helps you create new D&D campaign content based on your existing O
    OPENAI_API_KEY=sk-your-actual-api-key-here
    ```
 
-### 3. Sync Your Content
-Make sure your Obsidian content is synced:
+### 3. Content is Ready
+The AI agent now automatically loads from your organized content directories:
 ```bash
-npm run sync-obsidian
+npm run ai-cli
 ```
+
+No need to sync from Obsidian - the agent reads directly from your organized campaign content!
 
 ## Usage
 
@@ -69,7 +71,7 @@ npm run ai-generate "Design a haunted forest" LOCATION_HAUNTED_FOREST.md
 
 ## How It Works
 
-1. **Knowledge Base**: Loads all your synced markdown files and categorizes them
+1. **Knowledge Base**: Loads all your organized markdown files from the new type-based directories (`src/content/characters/`, `src/content/locations/`, `src/content/adventures/`, etc.) and categorizes them automatically
 2. **Context Matching**: Finds relevant existing content based on your prompt
 3. **AI Generation**: Uses GPT-4 with campaign context to create consistent content
 4. **Smart Formatting**: Outputs properly formatted markdown with frontmatter
@@ -125,8 +127,9 @@ The agent automatically categorizes your content:
 - Make sure there are no extra spaces or quotes
 
 **"Knowledge base empty"**
-- Run `npm run sync-obsidian` first
-- Check that you have .md files in `src/content/blog/obsidian/`
+- The AI agent automatically loads from your organized content directories
+- Check that you have .md files in `src/content/characters/`, `src/content/locations/`, etc.
+- Run `npm run ai-cli` and use the `list` command to see what's loaded
 
 **"Error generating content"**
 - Check your API key is valid and has credits
