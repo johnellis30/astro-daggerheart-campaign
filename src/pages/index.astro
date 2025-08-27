@@ -2,6 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import AudioPlayer from '../components/AudioPlayer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { getCollection } from 'astro:content';
 
@@ -279,6 +280,44 @@ const campaignCount = campaign.length;
 					<span class="category-count">{campaignCount} entries</span>
 				</a>
 			</div>
+
+			<!-- Audio Player for Campaign Atmosphere -->
+			<AudioPlayer 
+				title="Campaign Atmosphere" 
+				showControls={true}
+				soundEffects={[
+					{
+						name: "Tavern Ambience",
+						file: "/audio/tavern_ambience.mp3",
+						description: "Background chatter and clinking of mugs in a bustling tavern"
+					},
+					{
+						name: "Forest Journey",
+						file: "/audio/forest_journey.mp3",
+						description: "Birds chirping and leaves rustling during travel"
+					},
+					{
+						name: "Battle Drums",
+						file: "/audio/battle_drums.mp3",
+						description: "Intense drumming to build tension during combat"
+					},
+					{
+						name: "Ancient Magic",
+						file: "/audio/ancient_magic.mp3",
+						description: "Mystical humming and arcane energy sounds"
+					},
+					{
+						name: "Royal Court",
+						file: "/audio/royal_court.mp3",
+						description: "Formal atmosphere of noble proceedings"
+					},
+					{
+						name: "Dungeon Echoes",
+						file: "/audio/dungeon_echoes.mp3",
+						description: "Dripping water and distant sounds in underground chambers"
+					}
+				]}
+			/>
 
 			<div class="map-section">
 				<h2>The Land of Eldoria</h2>

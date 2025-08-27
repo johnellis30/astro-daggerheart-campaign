@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
+import fetch from 'node-fetch'; // For ElevenLabs API calls
 
 // Load environment variables
 dotenv.config();
@@ -27,6 +28,7 @@ const CONTENT_DIRS = [
 ];
 const REFERENCE_DOCS_DIR = path.join(__dirname, '../reference-docs');
 const AI_GENERATED_DIR = path.join(__dirname, '../ai-generated');
+const AUDIO_DIR = path.join(__dirname, '../public/audio'); // New audio directory
 const VAULT_PATH = 'C:/Users/johnd/OneDrive/Documents/Obsidian Vault';
 const PROJECT_CONTENT_DIRS = {
   'character': path.join(__dirname, '../src/content/characters'),
@@ -40,6 +42,11 @@ const PROJECT_CONTENT_DIRS = {
 const AI_MODEL = process.env.AI_MODEL || 'gpt-4-turbo-preview';
 const AI_TEMPERATURE = parseFloat(process.env.AI_TEMPERATURE) || 0.7;
 const AI_MAX_TOKENS = parseInt(process.env.AI_MAX_TOKENS) || 2000;
+
+// Audio generation settings
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
+const DEFAULT_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || 'pNInz6obpgDQGcFmaJgB'; // Adam voice
+const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1';
 
 class CampaignAIAgent {
   constructor() {
@@ -254,7 +261,7 @@ Type: PDF Reference Document`;
   }
 
   // Detect content type from prompt
-  detectContentType(prompt) {
+  detectContentType(prompt = '') {
     const promptLower = prompt.toLowerCase();
     
     // Check for explicit type mentions
@@ -556,6 +563,356 @@ Always include proper frontmatter with:
     } catch (error) {
       console.error('❌ Error generating content with image:', error.message);
       throw error;
+    }
+  }
+
+  // Generate audio using ElevenLabs API
+  async generateAudio(text, outputFilename = null, voiceId = DEFAULT_VOICE_ID) {
+    if (!ELEVENLABS_API_KEY) {
+      throw new Error('ElevenLabs API key is not set. Please configure the ELEVENLABS_API_KEY environment variable.');
+    }
+    
+    try {
+      console.log('🎵 Generating audio with ElevenLabs...');
+      
+      // Prepare the request payload
+      const payload = {
+        text,
+        voice: voiceId,
+        model: "eleven_multilingual_v1",
+        speed: 1.0,
+        stability: 0.75,
+        similarity_boost: 0.75
+      };
+      
+      // Call ElevenLabs API
+      const response = await fetch(`${ELEVENLABS_API_URL}/text-to-speech/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${ELEVENLABS_API_KEY}`
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`ElevenLabs API error: ${response.status} ${response.statusText}`);
+      }
+      
+      const reader = response.body.getReader();
+      const contentLength = +response.headers.get('Content-Length');
+      let receivedLength = 0;
+      let chunks = [];
+      
+      // Stream the audio content
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        chunks.push(value);
+        receivedLength += value.length;
+        
+        // Log progress
+        console.log(`Received ${receivedLength} of ${contentLength} bytes`);
+      }
+      
+      // Concatenate the audio chunks
+      const audioBuffer = Buffer.concat(chunks);
+      
+      // Generate filename if not provided
+      let filename = outputFilename;
+      if (!filename.includes('.')) {
+        const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
+        const timeHMS = new Date().toISOString().split('T')[1].split('.')[0].replace(/:/g, '');
+        filename = `AUDIO_${timestamp}_${timeHMS}.mp3`;
+      }
+      
+      // Save to audio directory
+      const savePath = path.join(AUDIO_DIR, filename);
+      
+      // Create directory if it doesn't exist
+      if (!fs.existsSync(AUDIO_DIR)) {
+        fs.mkdirSync(AUDIO_DIR, { recursive: true });
+      }
+      
+      fs.writeFileSync(savePath, audioBuffer);
+      
+      return {
+        audioUrl: `${ELEVENLABS_API_URL}/audio/${filename}`,
+        localPath: savePath,
+        filename,
+        saveLocation: `audio/${filename}`,
+        suggestedFolder: 'public/audio/'
+      };
+
+    } catch (error) {
+      console.error('❌ Error generating audio:', error.message);
+      throw error;
+    }
+  }
+
+  // Generate audio sound effects using ElevenLabs (alternative to OpenAI TTS)
+  async generateAudio(description, filename = null, voiceId = null, outputFormat = 'mp3') {
+    try {
+      if (!ELEVENLABS_API_KEY) {
+        console.log('⚠️  ElevenLabs API key not found. Set ELEVENLABS_API_KEY in your .env file.');
+        
+        // Fall back to creating a simple audio description file
+        return this.createAudioDescription(description, filename);
+      }
+
+      console.log('🎵 Generating audio sound effect...');
+      console.log(`   Description: ${description}`);
+
+      // Use provided voice or default
+      const voice = voiceId || DEFAULT_VOICE_ID;
+
+      // Create sound effect prompt for narration
+      const soundPrompt = await this.createSoundEffectPrompt(description);
+      
+      // Generate speech using ElevenLabs
+      const response = await fetch(`${ELEVENLABS_API_URL}/text-to-speech/${voice}`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'audio/mpeg',
+          'Content-Type': 'application/json',
+          'xi-api-key': ELEVENLABS_API_KEY
+        },
+        body: JSON.stringify({
+          text: soundPrompt,
+          model_id: 'eleven_monolingual_v1',
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.5
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`ElevenLabs API error: ${response.status} ${response.statusText}`);
+      }
+
+      // Generate filename if not provided
+      if (!filename) {
+        const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
+        const timeHMS = new Date().toISOString().split('T')[1].split('.')[0].replace(/:/g, '');
+        const cleanDesc = description.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 20);
+        filename = `${cleanDesc}_${timestamp}_${timeHMS}.${outputFormat}`;
+      } else if (!filename.includes('.')) {
+        filename = `${filename}.${outputFormat}`;
+      }
+
+      // Ensure audio directory exists
+      if (!fs.existsSync(AUDIO_DIR)) {
+        fs.mkdirSync(AUDIO_DIR, { recursive: true });
+      }
+
+      // Save audio file
+      const savePath = path.join(AUDIO_DIR, filename);
+      const audioBuffer = Buffer.from(await response.arrayBuffer());
+      fs.writeFileSync(savePath, audioBuffer);
+
+      console.log(`✅ Audio generated and saved: ${filename}`);
+
+      return {
+        filename,
+        localPath: savePath,
+        publicPath: `/audio/${filename}`,
+        description,
+        soundPrompt,
+        saveLocation: `public/audio/${filename}`,
+        duration: null, // Could be calculated if needed
+        format: outputFormat
+      };
+
+    } catch (error) {
+      console.error('❌ Error generating audio:', error.message);
+      
+      // Fall back to creating description file
+      return this.createAudioDescription(description, filename);
+    }
+  }
+
+  // Create a sound effect prompt suitable for narration/TTS
+  async createSoundEffectPrompt(description) {
+    await this.ensureInitialized();
+
+    try {
+      const response = await openai.chat.completions.create({
+        model: AI_MODEL,
+        messages: [
+          {
+            role: 'system',
+            content: `You are a narrator for a fantasy D&D campaign. Convert sound effect descriptions into short, atmospheric narration that can be read aloud to create immersion. 
+
+Focus on:
+- Brief, evocative descriptions (10-30 words)
+- Use onomatopoeia where appropriate
+- Set the mood and atmosphere
+- Keep it suitable for text-to-speech
+
+Examples:
+"sword clashing" → "Steel rings against steel as blades meet in deadly combat. *Clang! Clang!*"
+"footsteps in dungeon" → "Heavy boots echo through the cold stone corridor. *Step... step... step...*"
+"dragon roar" → "A thunderous roar shakes the very foundations. *ROAAARRR!*"
+"spell casting" → "Arcane energy crackles through the air. *Whoosh... ZAP!*"`
+          },
+          {
+            role: 'user',
+            content: `Create a short atmospheric narration for this sound effect: "${description}"`
+          }
+        ],
+        max_tokens: 100,
+        temperature: 0.8
+      });
+
+      return response.choices[0].message.content.trim();
+
+    } catch (error) {
+      // Fall back to simple narration if AI fails
+      return `${description}. The sound echoes through the scene.`;
+    }
+  }
+
+  // Fallback method when audio generation isn't available
+  createAudioDescription(description, filename = null) {
+    if (!filename) {
+      const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
+      const cleanDesc = description.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 20);
+      filename = `${cleanDesc}_${timestamp}_description.txt`;
+    }
+
+    const descriptionText = `AUDIO DESCRIPTION: ${description}
+
+This is a placeholder for an audio sound effect that would enhance the campaign scene.
+
+To enable actual audio generation:
+1. Sign up for ElevenLabs API at https://elevenlabs.io
+2. Add ELEVENLABS_API_KEY to your .env file
+3. Optionally set ELEVENLABS_VOICE_ID for a preferred voice
+
+The system will then generate actual audio files instead of these descriptions.
+`;
+
+    const savePath = path.join(AI_GENERATED_DIR, filename);
+    fs.writeFileSync(savePath, descriptionText);
+
+    return {
+      filename,
+      localPath: savePath,
+      description,
+      type: 'description-only',
+      message: 'Audio description created. Set up ElevenLabs API key to generate actual audio.'
+    };
+  }
+
+  // Generate multiple sound effects for a scene
+  async generateSceneSoundEffects(sceneDescription, soundEffects = []) {
+    await this.ensureInitialized();
+
+    try {
+      console.log('🎬 Generating sound effects for scene...');
+
+      // If no specific sound effects provided, analyze scene and suggest some
+      if (soundEffects.length === 0) {
+        soundEffects = await this.analyzeSoundEffects(sceneDescription);
+      }
+
+      const results = {
+        scene: sceneDescription,
+        soundEffects: [],
+        playlistSuggestion: []
+      };
+
+      // Generate each sound effect
+      for (const effect of soundEffects) {
+        console.log(`  🎵 Generating: ${effect}`);
+        const audioResult = await this.generateAudio(effect);
+        results.soundEffects.push({
+          description: effect,
+          audio: audioResult
+        });
+        
+        // Add to playlist suggestion
+        if (audioResult.publicPath) {
+          results.playlistSuggestion.push({
+            name: effect,
+            file: audioResult.publicPath,
+            trigger: 'manual' // Could be 'auto', 'timed', etc.
+          });
+        }
+
+        // Small delay between API calls to be respectful
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      // Save scene audio manifest
+      const manifestPath = path.join(AI_GENERATED_DIR, `scene_audio_${Date.now()}.json`);
+      fs.writeFileSync(manifestPath, JSON.stringify(results, null, 2));
+
+      console.log(`✅ Generated ${results.soundEffects.length} sound effects for scene`);
+      return results;
+
+    } catch (error) {
+      console.error('❌ Error generating scene sound effects:', error.message);
+      throw error;
+    }
+  }
+
+  // Analyze scene and suggest appropriate sound effects
+  async analyzeSoundEffects(sceneDescription) {
+    await this.ensureInitialized();
+
+    try {
+      const response = await openai.chat.completions.create({
+        model: AI_MODEL,
+        messages: [
+          {
+            role: 'system',
+            content: `You are a sound designer for a fantasy D&D campaign. Analyze scene descriptions and suggest 3-6 appropriate sound effects that would enhance the atmosphere and immersion.
+
+Consider:
+- Environmental sounds (wind, rain, fire crackling)
+- Action sounds (sword clashing, spell casting, footsteps)
+- Ambient sounds (tavern chatter, dungeon echoes, nature sounds)
+- Creature sounds (monster roars, bird calls, horses)
+- Emotional impact and atmosphere
+
+Return ONLY a JSON array of strings, each describing a specific sound effect:
+["description1", "description2", "description3"]
+
+Examples:
+- "heavy footsteps on stone stairs"
+- "crackling campfire with wind"
+- "distant wolf howl"
+- "sword being unsheathed"
+- "magical energy humming"
+- "tavern crowd murmuring"`
+          },
+          {
+            role: 'user',
+            content: `Suggest sound effects for this scene: "${sceneDescription}"`
+          }
+        ],
+        max_tokens: 200,
+        temperature: 0.7
+      });
+
+      const content = response.choices[0].message.content.trim();
+      
+      // Parse JSON response
+      try {
+        const soundEffects = JSON.parse(content);
+        return Array.isArray(soundEffects) ? soundEffects : [content];
+      } catch (parseError) {
+        // If JSON parsing fails, try to extract sound effects from text
+        const lines = content.split('\n').filter(line => line.trim());
+        return lines.map(line => line.replace(/^[-*•]\s*/, '').replace(/"/g, '').trim());
+      }
+
+    } catch (error) {
+      console.log('⚠️  Could not analyze scene for sound effects, using defaults');
+      return ['ambient environmental sound', 'footsteps', 'atmospheric background'];
     }
   }
 

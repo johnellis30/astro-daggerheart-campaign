@@ -1,0 +1,436 @@
+---
+// Audio Player Component for Campaign Sound Effects
+export interface Props {
+  title?: string;
+  showControls?: boolean;
+  soundEffects?: Array<{
+    name: string;
+    file: string;
+    description?: string;
+  }>;
+}
+
+const { 
+  title = "Campaign Audio", 
+  showControls = true,
+  soundEffects = []
+} = Astro.props;
+---
+
+<div class="audio-player" id="campaign-audio-player">
+  <div class="audio-header">
+    <h3>{title}</h3>
+    {showControls && (
+      <div class="audio-controls">
+        <button id="audio-toggle" class="control-btn">
+          <span class="audio-icon">🔊</span>
+        </button>
+        <button id="stop-all" class="control-btn stop-btn">
+          <span class="audio-icon">⏹️</span>
+        </button>
+      </div>
+    )}
+  </div>
+
+  {soundEffects.length > 0 && (
+    <div class="sound-effects-panel" id="sound-effects-panel">
+      <div class="effects-grid">
+        {soundEffects.map((effect, index) => (
+          <div class="effect-card" key={index}>
+            <button 
+              class="effect-btn" 
+              data-sound={effect.file}
+              data-name={effect.name}
+              title={effect.description || effect.name}
+            >
+              <span class="effect-name">{effect.name}</span>
+              <span class="play-icon">▶️</span>
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <!-- Hidden audio elements will be created dynamically -->
+  <div id="audio-elements" style="display: none;"></div>
+
+  <!-- Volume Control -->
+  {showControls && (
+    <div class="volume-control">
+      <label for="master-volume">Volume:</label>
+      <input 
+        type="range" 
+        id="master-volume" 
+        min="0" 
+        max="100" 
+        value="70"
+        class="volume-slider"
+      />
+      <span id="volume-display">70%</span>
+    </div>
+  )}
+</div>
+
+<style>
+  .audio-player {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgb(var(--gray-light));
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    max-width: 100%;
+  }
+
+  .audio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .audio-header h3 {
+    margin: 0;
+    color: rgb(var(--black));
+    font-size: 1.1rem;
+  }
+
+  .audio-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .control-btn {
+    background: rgb(var(--accent));
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+  }
+
+  .control-btn:hover {
+    background: rgb(var(--accent-dark));
+    transform: scale(1.05);
+  }
+
+  .stop-btn {
+    background: #dc3545;
+  }
+
+  .stop-btn:hover {
+    background: #c82333;
+  }
+
+  .sound-effects-panel {
+    margin-top: 1rem;
+  }
+
+  .effects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .effect-card {
+    background: white;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .effect-btn {
+    width: 100%;
+    background: white;
+    border: 1px solid rgb(var(--gray-light));
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+  }
+
+  .effect-btn:hover {
+    background: rgb(var(--gray-light));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .effect-btn.playing {
+    background: rgb(var(--accent-light));
+    border-color: rgb(var(--accent));
+  }
+
+  .effect-name {
+    font-size: 0.9rem;
+    color: rgb(var(--black));
+    font-weight: 500;
+  }
+
+  .play-icon {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .effect-btn.playing .play-icon::before {
+    content: "⏸️";
+  }
+
+  .volume-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgb(var(--gray-light));
+  }
+
+  .volume-control label {
+    font-size: 0.9rem;
+    color: rgb(var(--gray));
+    font-weight: 500;
+  }
+
+  .volume-slider {
+    flex: 1;
+    max-width: 200px;
+  }
+
+  #volume-display {
+    font-size: 0.9rem;
+    color: rgb(var(--gray));
+    min-width: 35px;
+    text-align: right;
+  }
+
+  @media (max-width: 768px) {
+    .effects-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .audio-header {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+
+    .volume-control {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+
+    .volume-slider {
+      width: 100%;
+      max-width: none;
+    }
+  }
+</style>
+
+<script>
+  class CampaignAudioManager {
+    constructor() {
+      this.audioElements = new Map();
+      this.isEnabled = true;
+      this.masterVolume = 0.7;
+      this.currentlyPlaying = new Set();
+      
+      this.init();
+    }
+
+    init() {
+      // Initialize controls
+      const audioToggle = document.getElementById('audio-toggle');
+      const stopAll = document.getElementById('stop-all');
+      const volumeSlider = document.getElementById('master-volume');
+      const volumeDisplay = document.getElementById('volume-display');
+
+      if (audioToggle) {
+        audioToggle.addEventListener('click', () => this.toggleAudio());
+      }
+
+      if (stopAll) {
+        stopAll.addEventListener('click', () => this.stopAllSounds());
+      }
+
+      if (volumeSlider) {
+        volumeSlider.addEventListener('input', (e) => {
+          const volume = parseInt(e.target.value);
+          this.setMasterVolume(volume);
+          if (volumeDisplay) {
+            volumeDisplay.textContent = `${volume}%`;
+          }
+        });
+      }
+
+      // Initialize sound effect buttons
+      const effectBtns = document.querySelectorAll('.effect-btn');
+      effectBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const soundFile = btn.getAttribute('data-sound');
+          const soundName = btn.getAttribute('data-name');
+          if (soundFile) {
+            this.toggleSound(soundFile, soundName, btn);
+          }
+        });
+      });
+
+      console.log('🎵 Campaign Audio Manager initialized');
+    }
+
+    toggleAudio() {
+      this.isEnabled = !this.isEnabled;
+      const toggleBtn = document.getElementById('audio-toggle');
+      
+      if (toggleBtn) {
+        const icon = toggleBtn.querySelector('.audio-icon');
+        if (icon) {
+          icon.textContent = this.isEnabled ? '🔊' : '🔇';
+        }
+      }
+
+      if (!this.isEnabled) {
+        this.stopAllSounds();
+      }
+
+      console.log(`Audio ${this.isEnabled ? 'enabled' : 'disabled'}`);
+    }
+
+    setMasterVolume(volume) {
+      this.masterVolume = volume / 100;
+      
+      // Update all existing audio elements
+      this.audioElements.forEach(audio => {
+        audio.volume = this.masterVolume;
+      });
+    }
+
+    async toggleSound(soundFile, soundName, buttonElement) {
+      if (!this.isEnabled) {
+        console.log('Audio is disabled');
+        return;
+      }
+
+      // Check if sound is currently playing
+      const isPlaying = this.currentlyPlaying.has(soundFile);
+      
+      if (isPlaying) {
+        this.stopSound(soundFile, buttonElement);
+      } else {
+        await this.playSound(soundFile, soundName, buttonElement);
+      }
+    }
+
+    async playSound(soundFile, soundName, buttonElement) {
+      try {
+        // Create or reuse audio element
+        let audio = this.audioElements.get(soundFile);
+        
+        if (!audio) {
+          audio = new Audio(soundFile);
+          audio.volume = this.masterVolume;
+          this.audioElements.set(soundFile, audio);
+
+          // Handle audio end
+          audio.addEventListener('ended', () => {
+            this.currentlyPlaying.delete(soundFile);
+            if (buttonElement) {
+              buttonElement.classList.remove('playing');
+            }
+          });
+        }
+
+        // Play the sound
+        await audio.play();
+        this.currentlyPlaying.add(soundFile);
+        
+        if (buttonElement) {
+          buttonElement.classList.add('playing');
+        }
+
+        console.log(`🎵 Playing: ${soundName || soundFile}`);
+
+      } catch (error) {
+        console.warn(`Failed to play sound: ${soundFile}`, error);
+      }
+    }
+
+    stopSound(soundFile, buttonElement) {
+      const audio = this.audioElements.get(soundFile);
+      
+      if (audio && !audio.paused) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+      
+      this.currentlyPlaying.delete(soundFile);
+      
+      if (buttonElement) {
+        buttonElement.classList.remove('playing');
+      }
+    }
+
+    stopAllSounds() {
+      this.audioElements.forEach((audio, soundFile) => {
+        if (!audio.paused) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      });
+      
+      this.currentlyPlaying.clear();
+      
+      // Remove playing class from all buttons
+      const playingBtns = document.querySelectorAll('.effect-btn.playing');
+      playingBtns.forEach(btn => btn.classList.remove('playing'));
+      
+      console.log('🔇 All sounds stopped');
+    }
+
+    // Public method to trigger sounds from external scripts
+    async playEffect(soundFile, soundName = null) {
+      const btn = document.querySelector(`[data-sound="${soundFile}"]`);
+      await this.playSound(soundFile, soundName, btn);
+    }
+
+    // Add sound effect dynamically
+    addSoundEffect(name, file, description = '') {
+      const effectsGrid = document.querySelector('.effects-grid');
+      if (!effectsGrid) return;
+
+      const effectCard = document.createElement('div');
+      effectCard.className = 'effect-card';
+      
+      effectCard.innerHTML = `
+        <button 
+          class="effect-btn" 
+          data-sound="${file}"
+          data-name="${name}"
+          title="${description || name}"
+        >
+          <span class="effect-name">${name}</span>
+          <span class="play-icon">▶️</span>
+        </button>
+      `;
+
+      const btn = effectCard.querySelector('.effect-btn');
+      btn.addEventListener('click', (e) => {
+        this.toggleSound(file, name, btn);
+      });
+
+      effectsGrid.appendChild(effectCard);
+    }
+  }
+
+  // Initialize when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    window.campaignAudio = new CampaignAudioManager();
+  });
+
+  // Make it globally available
+  window.CampaignAudioManager = CampaignAudioManager;
+</script>

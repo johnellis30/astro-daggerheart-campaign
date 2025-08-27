@@ -41,6 +41,7 @@
     "ai-cli": "node scripts/ai-cli.js",
     "ai-generate": "node scripts/ai-generate.js",
     "ai-image": "node scripts/ai-image.js",
+    "ai-audio": "node scripts/ai-audio.js",
     "organize-ai": "node scripts/organize-ai-content.js",
     "web-ai": "node scripts/web-ai-cli.js",
     "optimize-content": "node scripts/optimize-content.js",
