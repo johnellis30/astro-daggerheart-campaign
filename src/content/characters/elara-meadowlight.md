@@ -3,16 +3,16 @@ title: "Elara Meadowlight"
 description: "Elara Meadowlight is the respected Village Elder of Riverbend and the devoted guardia..."
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","npc","character"]
-heroImage: "/blog-placeholder-2.jpg"
-gmOnly: true
-playerVisible: false
+heroImage: "/images/characters/elara.png"
+gmOnly: false
+playerVisible: true
 ---
-
-
 # Elara Meadowlight
+
 *Campaign Character*
 
 # Elara Meadowlight
+
 *Sylvani Village Elder • Guardian of the Tear of the Moon*
 
 ## Description
@@ -31,9 +31,11 @@ Elara Meadowlight is the respected Village Elder of Riverbend and the devoted gu
 ## Role & Responsibilities
 
 ### Village Leadership
+
 As the Village Elder, Elara guides Riverbend through both mundane and spiritual matters. Her decisions are respected by all inhabitants, and she serves as the final authority on village disputes and important community decisions.
 
 ### Shrine Guardian
+
 The Tear of the Moon shrine is under her sacred protection. This ancient site holds deep significance for both the Sylvani people and the broader region, and Elara ensures its sanctity is maintained.
 
 ## Personality
@@ -52,7 +54,7 @@ The Tear of the Moon shrine is under her sacred protection. This ancient site ho
 ## Adventure Hooks
 
 - Seeks adventurers to investigate threats to the Tear of the Moon
-- Can provide guidance on Sylvani culture and forest lore  
+- Can provide guidance on Sylvani culture and forest lore
 - May request help mediating conflicts between Riverbend and neighboring settlements
 - Knows ancient secrets that could be crucial to ongoing campaigns
 

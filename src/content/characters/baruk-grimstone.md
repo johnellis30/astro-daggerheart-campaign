@@ -3,9 +3,9 @@ title: "Baruk Grimstone"
 description: "Baruk Grimstone is the boisterous owner of the River's Rest tavern in Riverbend."
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","npc","character"]
-heroImage: "/images/characters/baruk-grimstone.jpg"
-gmOnly: true
-playerVisible: false
+heroImage: "/images/characters/baruk.jpg"
+gmOnly: false
+playerVisible: true
 ---
 # Baruk Grimstone
 
