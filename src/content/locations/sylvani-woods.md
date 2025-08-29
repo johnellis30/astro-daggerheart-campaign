@@ -3,7 +3,7 @@ title: "Sylvani Woods"
 description: "The Sylvani Woods stretch along the western edge of Eldoria, a vast and ancient forest teeming with life and magic."
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","location","worldbuilding"]
-heroImage: "/blog-placeholder-about.jpg"
+heroImage: "/images/locations/sylvaniwoods.jpg"
 playerVisible: true
 ---
 # Sylvani Woods

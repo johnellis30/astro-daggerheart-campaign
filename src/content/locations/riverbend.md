@@ -3,7 +3,7 @@ title: "Riverbend"
 description: "Riverbend is a lush valley nestled between the mystical Sylvani Woods and the expansive Atherian Steppes."
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","location","worldbuilding"]
-heroImage: "/images/locations/riverbend.jpg"
+heroImage: "/images/locations/riverbend.jpeg"
 playerVisible: true
 ---
 # Riverbend

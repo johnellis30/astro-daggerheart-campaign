@@ -3,6 +3,7 @@ title: "The Ten Sects of Adonalsium: Faiths Under Dragon Wings"
 description: "Explore the ten diverse religious sects within the Atherian Empire, each led by ancient dragons embodying the essence of the shards."
 pubDate: 2025-08-25
 tags: ["daggerheart", "campaign", "Adonalsium", "dragons", "religion"]
+heroImage: "/images/campaign/dragonsreligion.jpg"
 ---
 In the sprawling lands of the Atherian Empire and beyond, the divine influence of Adonalsium permeates every aspect of life, faith, and magic. Among the myriad of beliefs, ten religious sects stand out, each under the guidance of an ancient dragon whose power and wisdom are rivalled only by their mysterious connection to the world's essence.
 

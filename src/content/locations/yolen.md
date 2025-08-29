@@ -3,7 +3,7 @@ title: "Yolen"
 description: "Yolen is a planet in the Cosmere, the original home of humanity and the location where Adonalsium was shattered."
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","location","worldbuilding"]
-heroImage: "/blog-placeholder-3.jpg"
+heroImage: "/images/locations/yolen.jpg"
 playerVisible: true
 ---
 

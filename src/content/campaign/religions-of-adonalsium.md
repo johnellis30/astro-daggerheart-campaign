@@ -3,6 +3,7 @@ title: "Faiths of the Fragmented God: Diverse Worship of Adonalsium"
 description: "An exploration of the various religious sects within the Atherian Empire that worship Adonalsium, reflecting the duality and diversity of its nature."
 pubDate: "2025-08-25"
 tags: ["daggerheart", "campaign", "religion", "adonalsium", "faiths"]
+heroImage: "/images/campaign/adon.jpg"
 ---
 In the vast lands of the Eldoria, the divine presence of Adonalsium is a central pillar of spiritual and daily life. However, the monolithic view of this deity fractures into a kaleidoscope of faiths, each reflecting a different aspect of Adonalsium's complex nature. These sects, while united in their reverence for the god, diverge in rituals, beliefs, and interpretations, mirroring the core traits of Adonalsium. Here, we delve into the rich tapestry of religions venerating Adonalsium in their unique ways.
 

@@ -3,12 +3,11 @@ title: "Atherian Steppes"
 description: "The Atherian Steppes: A vast expanse of open plains, characterized by tall grasses, rolling hills, and scattered rock formations."
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","location","worldbuilding"]
-heroImage: "/blog-placeholder-about.jpg"
+heroImage: "/images/locations/atheriansteppes.jpg"
 playerVisible: true
 ---
-
-
 # Atherian Steppes
+
 *Campaign Location*
 
 # Location: Atherian Steppes

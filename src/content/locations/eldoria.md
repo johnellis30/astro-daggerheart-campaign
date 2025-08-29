@@ -3,7 +3,7 @@ title: "Eldoria"
 description: "Eldoria: a continent where ancient forests whisper secrets to windswept plains, where rivers of liquid crystal carve paths through va..."
 pubDate: "2025-08-16"
 tags: ["dnd","campaign","location","worldbuilding"]
-heroImage: "/blog-placeholder-about.jpg"
+heroImage: "/images/locations/eldoria.jpg"
 playerVisible: true
 ---
 
